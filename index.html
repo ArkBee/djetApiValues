@@ -3,92 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Random Number Mini App</title>
+  <title>Подключение</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    
     button {
-      width: 100px;
-      height: 30px;
+      width: 150px;
+      height: 40px;
       font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
     }
-
-    .connecting {
+    
+    #status-bar {
+      width: 300px;
+      height: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    
+    #status-bar.connecting {
       background-color: #ffff00;
-      border-color: #ddd;
     }
-
-    .connected {
+    
+    #status-bar.connected {
       background-color: #008000;
-      border-color: #006600;
-    }
-
-    .disconnected {
-      background-color: #ff0000;
-      border-color: #cc0000;
     }
   </style>
 </head>
 <body>
-  <button id="randomNumberButton">Показать рандомное число</button>
-  <p id="randomNumberDisplay"></p>
-  <p id="connectionStatus"></p>
+  <h1>Подключение</h1>
+  <button id="connect-button">Подключиться</button>
+  <p id="status-bar"></p>
   <script>
-    const ws = new WebSocket('ws://localhost:8765');
-    const randomNumberButton = document.getElementById('randomNumberButton');
-    const randomNumberDisplay = document.getElementById('randomNumberDisplay');
-    const connectionStatus = document.getElementById('connectionStatus');
+    const connectButton = document.getElementById('connect-button');
+    const statusBar = document.getElementById('status-bar');
 
-    // Функция для обновления цвета кнопки
-    function updateButtonColor(status) {
-      switch (status) {
-        case 'connecting':
-          randomNumberButton.classList.add('connecting');
-          randomNumberButton.classList.remove('connected', 'disconnected');
-          break;
-        case 'connected':
-          randomNumberButton.classList.add('connected');
-          randomNumberButton.classList.remove('connecting', 'disconnected');
-          break;
-        case 'disconnected':
-          randomNumberButton.classList.add('disconnected');
-          randomNumberButton.classList.remove('connecting', 'connected');
-          break;
-      }
+    // Функция для имитации подключения
+    function simulateConnection() {
+      statusBar.classList.add('connecting');
+      
+      setTimeout(function() {
+        statusBar.classList.remove('connecting');
+        statusBar.classList.add('connected');
+        
+        // Переход на другую страницу
+        window.location.href = "ws_test/wstest.html";
+      }, 3000);
     }
 
-    // Обработчики событий WebSocket
-
-    ws.onopen = function() {
-      console.log('Соединение установлено');
-      updateButtonColor('connected');
-      connectionStatus.innerText = 'Соединено';
-      // Здесь можно также отправить сообщение серверу, если требуется
-    };
-
-    ws.onmessage = function(event) {
-      console.log('Сообщение от сервера: ', event.data);
-      // Обновление интерфейса с полученным сообщением
-      randomNumberDisplay.innerText = event.data;
-    };
-
-    ws.onerror = function(error) {
-      console.log('Ошибка соединения: ', error);
-      updateButtonColor('disconnected');
-      connectionStatus.innerText = 'Ошибка соединения';
-    };
-
-    ws.onclose = function() {
-      console.log('Соединение закрыто');
-      updateButtonColor('disconnected');
-      connectionStatus.innerText = 'Соединение закрыто';
-    };
-
-    // Подключение к серверу
-    ws.connect();
-
     // Обработчик события нажатия кнопки
-    randomNumberButton.addEventListener('click', function() {
-      // Отправка запроса на сервер
-      ws.send('get_random_number');
+    connectButton.addEventListener('click', function() {
+      simulateConnection();
     });
   </script>
 </body>
