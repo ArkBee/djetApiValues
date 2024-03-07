@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebSocket Клиент</title>
+    <title>WebSocket Тест</title>
 </head>
 <body>
+    <button id="generateBtn">Сгенерировать число</button>
+    <p id="numberDisplay">Число не сгенерировано</p>
     <script>
         var ws = new WebSocket("ws://localhost:8765");
+        var btn = document.getElementById('generateBtn');
+        var display = document.getElementById('numberDisplay');
+
         ws.onopen = function() {
             console.log("Соединение установлено.");
-            ws.send("Привет, это клиент!");
         };
+
         ws.onmessage = function(event) {
             console.log("Получено сообщение: " + event.data);
+            display.textContent = "Сгенерированное число: " + event.data;
         };
+
         ws.onerror = function(error) {
             console.log("Ошибка: " + error.message);
+        };
+
+        btn.onclick = function() {
+            ws.send("generate");
         };
     </script>
 </body>
