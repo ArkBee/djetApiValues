@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Клиент</title>
+</head>
+<body>
+    <script>
+        var ws = new WebSocket("ws://localhost:8765");
+        ws.onopen = function() {
+            console.log("Соединение установлено.");
+            ws.send("Привет, это клиент!");
+        };
+        ws.onmessage = function(event) {
+            console.log("Получено сообщение: " + event.data);
+        };
+        ws.onerror = function(error) {
+            console.log("Ошибка: " + error.message);
+        };
+    </script>
+</body>
+</html>
