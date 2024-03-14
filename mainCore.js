@@ -96,7 +96,7 @@ function BetSizeChange(char='+', value, nubmerOfCounter = 1)
 let isUserMadeBet = false; // Чекаем на ставку
 let UserBetSize = 0;
 
-let queueOfX = [20.12, 30.01, 40.11, 50.01]; // Заранее заданный список чисел
+let queueOfX = [1.34, 1.37, 1.16, 30.39]; // Заранее заданный список чисел
 
 function makeBet(btnNumber=1) {
   console.info('makeBet');
