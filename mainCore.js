@@ -16,7 +16,7 @@ const balanceHtml = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div
 // 1 окно управления ставкой
 let BetSizeValue1 = document.querySelectorAll('#bet-amount-mobile-input')[0];
 BetSizeValue1.addEventListener('input', () =>  
-{ 
+{
   BetSize = parseFloat(BetSizeValue1.value);
 });
 
@@ -26,22 +26,22 @@ const betButton1 = document.querySelectorAll("#make-bet-button > div")[0];
 betButton1.addEventListener('click', () => makeBet(1));
 
 const PlusButton1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-gJqSRm.fFHqHx > div:nth-child(3) > button > div");
-PlusButton1.addEventListener('click', () => BetSizeChange('+', 10,1));
+PlusButton1.addEventListener('click', () => BetSizeChange('+', 10, 1));
 
 const MinusButton1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-gJqSRm.fFHqHx > div:nth-child(1) > button");
-MinusButton1.addEventListener('click', () => BetSizeChange('-', 10,1));
+MinusButton1.addEventListener('click', () => BetSizeChange('-', 10, 1));
 
 const Plus50Button1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(1) > button");
-Plus50Button1.addEventListener('click', () => BetSizeChange('+',50,1));
+Plus50Button1.addEventListener('click', () => BetSizeChange('+', 50, 1));
 
 const Plus100Button1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(2)");
-Plus100Button1.addEventListener('click', () => BetSizeChange('+', 100,1));
+Plus100Button1.addEventListener('click', () => BetSizeChange('+', 100, 1));
 
 const Plus200Button1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(3) > button");
-Plus200Button1.addEventListener('click', () => BetSizeChange('+', 200,1));
+Plus200Button1.addEventListener('click', () => BetSizeChange('+', 200, 1));
 
 const Plus500Button1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(4) > button");
-Plus500Button1.addEventListener('click', () => BetSizeChange('+', 500,1));
+Plus500Button1.addEventListener('click', () => BetSizeChange('+', 500, 1));
 
 // 2 окно управления ставкой
 let BetSizeValue2 = document.querySelectorAll('#bet-amount-mobile-input')[1];
@@ -68,62 +68,88 @@ let isMotionJetPackActive = false;
 let isFlyawayActive = false;
 let isWaitingProgressBarActive = false;
 let isNotifyWinActive = false;
-let isInTime = false; //Флаг для индикации, что сейчас можно сделать ставку, которая будет сейчас учитываться
+let canBetToThisRound = false; //Флаг для индикации вовремя ли ставка. TRUE - МОЖНО ДЕЛАТЬ СТАВКУ, FALSE - НЕЛЬЗЯ ДЕЛАТЬ СТАВКУ
 
 // Флаги для проверки взаимодействия с пользователем
 let isBetInTime = false; // Если ставка сделана вовремя, то она вычисляется выйгрыш относительно коэффициента
-let BetSize = 10;
+let BetSize = 10.001;
 
-let balanceValue = 500.03; // Баланс пользователя
-function updateBalance(value) 
+let balanceValue = 500.01; // Баланс пользователя
+
+/**
+ * Изменение операции с балансом
+ * @param {boolean} operation какое дейсвие true + | false -.
+ * @param {number} value размер проигрыша или выйгрыша 
+ */
+function updateBalance(operation, value)
 {
-  balanceValue = value;
-  balanceHtml.textContent = `${ value } ₽`;
+  value = parseFloat(value.toFixed(2));
+  if (operation) balanceValue += value;
+  else balanceValue -= value;
+    
+  balanceHtml.textContent = `${ (balanceValue.toFixed(2)) } ₽`;
+
+  //TODO добавить обновление баланса при начале раунда
+  //TODO добавить обновление баланса при выйгрыше - в calculate WIN
 }
 
-function BetSizeChange(char='+', value, nubmerOfCounter = 1) 
+/**
+ * Изменение назмера ставки.
+ * @param {symbol} char какое дейсвие + -.
+ * @param {number} value Значение кнопки.
+ * @param {number} nubmerOfCounter Номер блока 1 2 3-оба сразу 
+ */
+function BetSizeChange(char = '+', value, nubmerOfCounter = 1) 
 {
-  if (char === '+')   BetSize += value;      
-  else if(char === '-')
+  if (char === '+') BetSize += value;
+  else if (char === '-')
   {
     BetSize -= value;
   }
-  if(BetSize < 10) BetSize = 10;
+  if (BetSize < 10) BetSize = 10;
   BetSizeValue1.value = BetSize + ' ₽';
 }
 
 // USER VARIABLES
 let isUserMadeBet = false; // Чекаем на ставку
-let UserBetSize = 0;
+let UserBetSize = 0.001;
 
-let queueOfX = [1.34, 1.37, 1.16, 30.39]; // Заранее заданный список чисел
+let queueOfX = [1.21, 30.28, 1.16, 30.39]; // Заранее заданный список чисел
 
-function makeBet(btnNumber=1) {
+/**
+ * Процесс соверщения ставки.
+ * @param {symbol} btnNumber нужно для измения состояния кнопки
+ */
+function makeBet(btnNumber = 1) 
+{
   console.info('makeBet');
   console.info('isUserMadeBet ' + isUserMadeBet);
   console.info('isBetInTime ' + isBetInTime);
-  if(isUserMadeBet && isBetInTime) // Ставка сделана, забираем выйгрыщ
-  { //ЗАБИРАЕМ ВЫЙГРЫШ
-    isUserMadeBet = false;
-    
-    calculateWin();    
-    //UserBetSize = 0.2;
-    changeBetButtonsClass(btnNumber, 'gTqZvy');    // Применяем класс "Ставка" к первой кнопке
-  }
-  else if(isUserMadeBet && isBetInTime && isInTime) // Ставка сделана, но не вовремя
-  { //ОТМЕНЯЕМ СТАВКУ
-    isUserMadeBet = false;    
-    changeBetButtonsClass(btnNumber, 'gTqZvy');    // Применяем класс "Ставка" к первой кнопке
-  }
-  else if(!isUserMadeBet && !isBetInTime) // Ставка не сделана, но не вовремя
-  { //Делаем СТАВКУ
-    isBetInTime = isInTime; // Если ставка не была сделана вовремя, то она считается вовремя
+  console.info('UserBetSize ' + UserBetSize);
+
+  if (!isUserMadeBet && !isBetInTime) // Ставка не сделана и не вовремя > ставим ставку в очередь
+  {
+    //Делаем СТАВКУ
+    isBetInTime = canBetToThisRound; // Статус вовремя ставка или на след рауд true = вовремя, false = на след раунд
     isUserMadeBet = true;
     UserBetSize = BetSize;
-    changeBetButtonsClass(btnNumber, 'otmenit');    // Применяем класс "Ставка" к первой кнопке
+    changeBetButtonsClass(btnNumber, 'otmenit');    // Применяем класс "Ставка" к первой кнопке    
   }
-  
-  
+  else if (isUserMadeBet && isBetInTime) // Если юзер СДЕЛАЛ ставку и ставка сделана вовремя > кнопка получения выйгрыша
+  { //ЗАБИРАЕМ ВЫЙГРЫШ
+    console.info('ЗАБИРАЕМ ВЫЙГРЫШ');
+    isUserMadeBet = false;
+    isBetInTime = false;
+    calculateWin();
+    //UserBetSize = 0.2;
+    changeBetButtonsClass(btnNumber, 'gTqZvy');    // Меняем состояние кнопки на "Ставка"
+  }
+  else if (isUserMadeBet && isBetInTime && canBetToThisRound) // Если ставка сделана и вовремя и сейчас не можно делать ставку > отменяем ставку
+  { //ОТМЕНЯЕМ СТАВКУ
+    isUserMadeBet = false;
+    changeBetButtonsClass(btnNumber, 'gTqZvy');    // Применяем класс "Ставка" к первой кнопке
+  }
+
 }
 
 // Оживляем JetPack
@@ -137,14 +163,13 @@ function motionJetPack(command)
       cancelAnimationFrame(animationFrameId); // Останавливаем анимацию
       animationFrameId = null; // Сбрасываем идентификатор
       isMotionJetPackActive = false; // Сбрасываем флаг активности анимации 
-
     }
     return; // Выходим из функции, не продолжая анимацию
   }
 
   // Анимация началась
   isMotionJetPackActive = true;
-  //onsole.info('motionJetPack ИДЁТ АНИМАЦИЯ' );
+  //console.info('motionJetPack ИДЁТ АНИМАЦИЯ' );
 
   AllJettPak.style.opacity = '1';
   JetPak.style.opacity = "1";
@@ -188,7 +213,7 @@ function motionJetPack(command)
 
 async function StartJetPack(coefficientX)
 {
-  isInTime = false; // Вовремя начала раунда, ставки идут на следующий раунд
+  canBetToThisRound = false; // Вовремя начала раунда, ставки идут на следующий раунд
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
   if (isWaitingProgressBarActive) await waitForAnimationToComplete('isWaitingProgressBarActive');
@@ -198,7 +223,7 @@ async function StartJetPack(coefficientX)
   //onsole.info('StartJetPack ВЗЛЁТ АНИМАЦИЯ' );
 
   Xg = -95; // Начальное значение X
-  Yg = 120;  // Начальное значение Y 90
+  Yg = 90;  // Начальное значение Y 90
 
   // Рассчитываем процент выполнения анимации на основе коэффициента X
 
@@ -224,7 +249,7 @@ async function StartJetPack(coefficientX)
 
       // Обновляем координаты для анимаций прыжка
       var newX = Xg - 70 * 2.5;
-      var newY = Yg + 20;
+      var newY = Yg + 20; //20
       //console.info('newY ' + newY);
       var newD = `M -95 190 Q ${ 167 + newX } 190 ${ 250 + newX } ${ newY }`;
       jumpLine1.setAttribute('d', newD); // Обновляем атрибут 'd' для первой линии
@@ -258,12 +283,20 @@ async function flyawayJetPack(X)
   // Корректируем последнее значение, чтобы точно соответствовать цели
   curX.textContent = parseFloat(X).toFixed(2);
   parrentDivBlock.prepend(createClass(X)); // Добавляем новый блок с числом в верхнюю часть экрана
+  changeBetButtonsClass(3, 'gTqZvy');
+  if (isUserMadeBet) // если ставка была, то она сгорела
+  {
+    isUserMadeBet = false;
+    isBetInTime = false;
+  }
+
+
   if (X > 1.0 && isUserMadeBet)
   {
-    if(isBetInTime) UserBetSize = 0; // Сбрасываем ставку, если она была сделана вовремя
+    if (isBetInTime) UserBetSize = 0; // Сбрасываем ставку, если она была сделана вовремя
     else isBetInTime = true; // Если ставка не была сделана вовремя, то устанавливаем флаг, что теперь она активна, это нужно чтобы в начале рауда изменить кнопку на "Забрать"
     // Если значение больше 1.1, то это выигрыш
-   // calculateWin(); // Вызываем функцию для расчёта выигрыша
+    // calculateWin(); // Вызываем функцию для расчёта выигрыша
   }
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
@@ -295,8 +328,9 @@ async function flyawayJetPack(X)
           {
             isFlyawayActive = false;
             //onsole.info('isFlyawayActive ОФАЕМ ПЕРЕМЕННУЮ');
-            WaitingProgreesBar(); // Запускаем анимацию полосы ожидания
             curX.textContent = parseFloat(1.00).toFixed(2);
+            WaitingProgreesBar(); // Запускаем анимацию полосы ожидания
+
 
           }, 2000);
         }, 3000);
@@ -315,23 +349,33 @@ function calculateWin()
 {
   setElementOpacity(Waiting, '0');
   setElementOpacity(notifyWin, '1');
-  if (isBetInTime && isUserMadeBet) //если ставка вовремя, то считаем выйгрыш 
+
+  let XNow = parseFloat(curX.textContent);
+  let win = UserBetSize * XNow; //TODO - calculate win  
+  win = parseFloat(win.toFixed(2));//win нужно округлить до 2 числе после знака
+  console.info("win: " + win);
+  console.info("UserBetSize: " + UserBetSize);
+  updateBalance(true, win); //TODO - добавить обновление баланса при выйгрыше
+
+  console.info("XNow: " + XNow);
+  console.info("win: " + win);
+  notifyWin.children[0].children[0].children[1].textContent = 'x' + XNow;  //notification
+  notifyWin.children[0].children[1].children[0].textContent = `${win} ₽`; // how much money is raised
+  setElementOpacity(notifyWin, '1');
+  setElementOpacity(parrentDivBlock, '0');
+
+  //Убрать уведомление о выйгрыше
+  setTimeout(() =>
   {
-    let win = UserBetSize * curX; //TODO - вычислить выйгрыш
-    notifyWin.children[0].children[0].children[1].innerHTML = 'x222.36';  //уведомление
-    notifyWin.children[0].children[1].children[0].innerHTML = '212222.20&nbsp;₽'; // скок деняг поднято
-    setElementOpacity(parrentDivBlock, '0');
-    //Убрать уведомление о выйгрыше
-    setTimeout(() =>
-    {
-      setElementOpacity(notifyWin, '0');
-    }, 5000);
-  }
+    setElementOpacity(notifyWin, '0');
+  }, 5000);
+
 
   //TODO добавить в FLYAway изменение кнопки, если юзер сделал ставку
 
 
 }
+// Есть 2 блока. Находятся друг над другом, при увеличении окна делать так, чтобы они разъезжались и были параллельно. 
 
 /* //работа с WEB-сокетами
 var ws = new WebSocket("ws://localhost:8765");
@@ -346,15 +390,20 @@ async function WaitingProgreesBar() //Ждём следующего раунда
   let x = null; // Генерируем новое число
 
   //Если ставка сделана, то меняем кнопку на ожидание на момент загрузки, потом поменяем на "Забрать"
-  isInTime = false; // Вовремя начала раунда, ставки идут на следующий раунд
-  if(!isBetInTime && isUserMadeBet)   changeBetButtonsClass(1, 'ozgidanie'); // Применяем класс "Ставка" к первой кнопке
+  canBetToThisRound = true; // Вовремя начала раунда, ставки идут на следующий раунд
+  if (!isBetInTime && isUserMadeBet) 
+  {
+    changeBetButtonsClass(1, 'ozgidanie'); // Применяем класс "Ставка" к первой кнопке    
+    updateBalance(false, BetSize); //обновление баланса при проигрыше
+  }
+
   //ws.send("generate");
 
   if (isUserMadeBet && !isBetInTime)
   {
-    isBetInTime= true; // Если ставка была сделана до начала раунда, то она считается вовремя
-                                // выигрыш будет учитываться
-  } 
+    isBetInTime = true; // Если ставка была сделана до начала раунда, то она считается вовремя
+    // выигрыш будет учитываться
+  }
 
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
@@ -458,7 +507,8 @@ function generateWeightedNumber(useAlternative = false)
   }
 }
 
-function changeBetButtonsClass(numberButton, className) {
+function changeBetButtonsClass(numberButton, className)
+{
   // Определение классов и соответствующих цветов
   const classes = ["gTqZvy", "zabrat", "ozgidanie", "otmenit"];
   const classToColor = {
@@ -467,7 +517,7 @@ function changeBetButtonsClass(numberButton, className) {
     otmenit: 'linear-gradient(263.87deg, rgb(245, 78, 118) 0%, rgb(252, 36, 75) 100%)', // Красный
     ozgidanie: 'transparent' // Предположим, что оранжевый цвет для "Ожидания" будет прозрачным
   };
-  
+
   // Соответствие классов тексту кнопки
   const classToButtonText = {
     ozgidanie: 'Ожидание',
@@ -477,7 +527,8 @@ function changeBetButtonsClass(numberButton, className) {
     // Добавьте другие соответствия здесь, если необходимо
   };
 
-  function updateButtonClass(button) {
+  function updateButtonClass(button)
+  {
     // Удаляем предыдущие классы, чтобы избежать конфликтов
     button.classList.remove(...classes);
     // Добавляем новый класс
@@ -487,17 +538,21 @@ function changeBetButtonsClass(numberButton, className) {
     button.parentElement.style.setProperty('--after-color', color);
     // Изменяем текст кнопки, если для класса определен текст
     const buttonText = classToButtonText[className];
-    if (buttonText) {
+    if (buttonText)
+    {
       button.textContent = buttonText;
     }
   }
-  
+
   // Предположим, что betButton1 и betButton2 определены где-то в вашем коде
-  if (numberButton === 1) {
+  if (numberButton === 1)
+  {
     updateButtonClass(betButton1);
-  } else if (numberButton === 2) {
+  } else if (numberButton === 2)
+  {
     updateButtonClass(betButton2);
-  } else if (numberButton === 0) { // Применяем для всех кнопок
+  } else if (numberButton === 0)
+  { // Применяем для всех кнопок
     updateButtonClass(betButton1);
     updateButtonClass(betButton2);
   }
@@ -520,8 +575,8 @@ function animateNumber(targetX)
   let updateInterval = 50; // Интервал обновления в миллисекундах
 
   //РАБОТА С ПОЛЬЗОВАТЕЛЕМ
-  if(isBetInTime && isUserMadeBet)   changeBetButtonsClass(1, 'zabrat'); // Применяем класс "Ставка" к первой кнопке
-  
+  if (isBetInTime && isUserMadeBet) changeBetButtonsClass(1, 'zabrat'); // Применяем класс "Ставка" к первой кнопке
+
   StartJetPack(targetX);
   function updateNumber(timestamp)
   {
