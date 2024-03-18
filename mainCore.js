@@ -11,6 +11,8 @@ const jumpLine1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.s
 const jumpLine2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO > div > div:nth-child(1) > div.sc-fnGiBr.gpBElz > div.sc-eDWCr.iiOtUt > svg > g > path:nth-child(2)");
 const notifyWin = document.querySelector("#mobile > div.sc-lhlUkk.aBbyI");
 const balanceHtml = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-cqQeAO.kvGivG > div > div > div.sc-iAEawV.bjXaQD.sc-AHaJN.sc-EJAja.lioyCd.jGycXN > button > div > div");
+const currentWinInButton = document.querySelector("#make-bet-button > div > div.currentWin.zabratX");
+
 
 
 // 1 окно управления ставкой
@@ -72,7 +74,7 @@ let canBetToThisRound = false; //Флаг для индикации воврем
 
 // Флаги для проверки взаимодействия с пользователем
 let isBetInTime = false; // Если ставка сделана вовремя, то она вычисляется выйгрыш относительно коэффициента
-let BetSize = 10.001;
+let BetSize = 10.00;
 
 let balanceValue = 500.01; // Баланс пользователя
 
@@ -114,7 +116,7 @@ function BetSizeChange(char = '+', value, nubmerOfCounter = 1)
 let isUserMadeBet = false; // Чекаем на ставку
 let UserBetSize = 0.001;
 
-let queueOfX = [1.21, 30.28, 1.16, 30.39]; // Заранее заданный список чисел
+let queueOfX = [1.54, 12.28, 1.16, 30.39]; // Заранее заданный список чисел
 
 /**
  * Процесс соверщения ставки.
@@ -220,7 +222,10 @@ async function StartJetPack(coefficientX)
 
   // Теперь мы уверены, что другие анимации завершены
   isMotionJetPackActive = true;
-  //onsole.info('StartJetPack ВЗЛЁТ АНИМАЦИЯ' );
+  //console.info('StartJetPack ВЗЛЁТ АНИМАЦИЯ' );
+
+
+
 
   Xg = -95; // Начальное значение X
   Yg = 90;  // Начальное значение Y 90
@@ -283,11 +288,12 @@ async function flyawayJetPack(X)
   // Корректируем последнее значение, чтобы точно соответствовать цели
   curX.textContent = parseFloat(X).toFixed(2);
   parrentDivBlock.prepend(createClass(X)); // Добавляем новый блок с числом в верхнюю часть экрана
-  changeBetButtonsClass(3, 'gTqZvy');
   if (isUserMadeBet) // если ставка была, то она сгорела
   {
     isUserMadeBet = false;
     isBetInTime = false;
+    // делаем кнопку ставка
+
   }
 
 
@@ -542,7 +548,32 @@ function changeBetButtonsClass(numberButton, className)
     {
       button.textContent = buttonText;
     }
+
+
+    // Добавление или обновление элемента с классом 'currentWin zabratX' при нажатии на кнопку "Забрать"
+    if (className === 'zabrat') 
+    {
+      // Проверяем, существует ли уже элемент 'currentWin zabratX' в родительском элементе
+      let currentWin = button.parentElement.querySelector('.currentWin.zabratX');
+      if (!currentWin)
+      {
+        // Если элемент не найден, создаем его
+        currentWin = document.createElement('div');
+        currentWin.className = 'currentWin zabratX';
+        currentWin.style.display = 'block'; // Убедитесь, что элемент видим
+        currentWin.textContent = '0.00'; // Установите значение или текст, который нужен
+        button.prepend(currentWin); // Добавляем созданный элемент в кнопку
+      }
+      else
+      {
+        // Если элемент уже существует, обновляем его содержимое
+        currentWin.textContent = '0.00'; // Обновите, если требуется
+      }
+      // Если элемент уже существует, можно обновить его содержимое или стили здесь
+    }
   }
+
+
 
   // Предположим, что betButton1 и betButton2 определены где-то в вашем коде
   if (numberButton === 1)
@@ -588,6 +619,32 @@ function animateNumber(targetX)
     {
       currentNumber += step;
       curX.textContent = currentNumber.toFixed(2);
+
+      // при начале раунда, если пользователь сделал ставку, то меняет display с none на block.
+      // в конце раунда, если пользователь сделал ставку, то меняет display с block на none.
+      if (isUserMadeBet && currentNumber <= 1.0)
+      {
+        changeBetButtonsClass(1, 'zabrat');
+        console.info("СДЕЛАЛИ КНОПКИ Забрать СТРОКА 628--------")
+      }
+      else if(isUserMadeBet && currentNumber > 1.3)
+      {
+        console.info("СТРОКА 632 "+ currentWinInButton.textContent);
+        //проверка currentWinInButton на существование 
+        if (currentWinInButton.textContent.length>1)
+        {
+          currentWinInButton.textContent = UserBetSize +' ₽';
+        } 
+        else 
+        {
+          console.info("ХУУУУЙ")
+          currentWinInButton = document.querySelector("#make-bet-button > div > div.currentWin.zabratX");
+          currentWinInButton.textContent = currentNumber +' ₽';
+        }
+      
+        
+      }
+
       lastTimestamp = timestamp; // Обновляем время последнего обновления
 
       // Адаптируем шаг изменения числа
@@ -610,8 +667,10 @@ function animateNumber(targetX)
       requestAnimationFrame(updateNumber);
     } else if (currentNumber >= targetX && targetX > 1.2)
     {
-      flyawayJetPack(targetX);  //Улетел - просто переименование стиля
-
+      changeBetButtonsClass(0, 'gTqZvy'); //Делаем все кнопки доступными к 
+      console.info("СДЕЛАЛИ КНОПКИ Ставка")
+      currentWinInButton.style.display = 'none'; //Скрываем div с индикатором выйгрыша
+      flyawayJetPack(targetX);  //Улетел - просто переименование стиля      
     }
   }
 
