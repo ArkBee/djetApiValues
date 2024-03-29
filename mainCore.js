@@ -1,3 +1,136 @@
+class BetBlock 
+{
+  /**
+   * 
+   * @param {number} sizeBet - Размер ставки
+   * @param {number} id - ID блока
+   */
+  constructor(sizeBett = 10.00, id) {
+    this.ID = id; // Инициализация ID блока
+    this._isMadeBet = false; // Инициализация состояния "Ставка сделана"
+    this._isBetToNextRound = false; // Инициализация состояния "Ставка на след раунд"
+    this._sizeBet = sizeBett; // Инициализация "Размер ставки"
+    this._userBetSize = 0; // "Размер ставки пользователя" инициализируется отдельно
+    this._winAmount = 0; // Инициализация "Выигрыш по ставке"
+    this._buttonStatus = 'gTqZvy'; // Статус кнопки
+    this._showNotifyWin = null; // Сиюда кидаем подписку на собитие
+    this._lastWin = 0; // Последний выигрыш
+  }
+  /**
+  * @param {number} sizeBet - рАзмер ставки в Input поле
+  */
+  set sizeBet(size) {
+    if (DEV_MODE) console.info('ALOOOOOOOOOOOOOOOO    '+size );
+    size = Math.max(10, size); // Устанавливаем нижний предел в 10
+    size = Math.min(size, 10000); // Устанавливаем верхний предел в 10000
+    this._sizeBet = size;
+    this.triggerEvent('sizeBetChanged', size);
+  }
+  get sizeBet() {
+    return this._sizeBet;
+  }
+
+
+ /**
+  * @param {boolean} isBet - Сюда кидаем значение canBetToThisRound и меняем значение на противоположное
+  *  
+  */ 
+  //isBetToNextRound
+set isBetToNextRound(isBet) {
+  this._isBetToNextRound = isBet;
+}
+get isBetToNextRound() {
+  return this._isBetToNextRound;
+}
+
+  /**
+   * @param {number} valueOfWin - Сколько игрок выйграл в последней игре
+   */
+  set lastWin(valueOfWin) {
+    this._lastWin = valueOfWin;
+    this.triggerEvent('lastWinChanged', this._lastWin);
+  }
+  get lastWin() {
+    return this._lastWin;
+  }
+
+  /**
+   * @param {*} UserBetSize - Размер ставки пользователя
+   */
+  set UserBetSize(size) {
+    this._userBetSize = size;
+    this.triggerEvent('UserBetSizeChanged', size);
+  }
+  get UserBetSize() {
+    return this._userBetSize;
+  }
+
+/**
+ * @param {boolean} isMade - Сделана ли ставка
+ */
+  set isMadeBetToThisRound(isMade) {
+    this._isMadeBet = isMade;    
+  }
+  get isMadeBetToThisRound() {
+    return this._isMadeBet;
+  }
+
+  /**
+   * @param {string} status - Статус кнопачки))
+   */
+  set buttonStatus(status) {
+    this._buttonStatus = status;
+    this.triggerEvent('buttonStatusChanged', this._buttonStatus); // Вызываем событие
+  }
+  get buttonStatus() {
+    return this._buttonStatus;
+  }
+
+setOnChange(callback) {
+  this._showNotifyWin = callback;
+}
+
+// Пример метода для вызова "ивента"
+triggerEvent(eventName, value) 
+{  
+  // Здесь можно добавить любую логику, например, изменение DOM или отправку данных на сервер
+  //если изменнена ставка, то меняем в DOM
+  if(eventName === 'sizeBetChanged')
+  {
+    if(DEV_MODE) console.info('В КЛАССЕ ----(sizeBetChanged)---- ' + value);
+    //нормализуем и лепим в DOM    
+    let divArea =   this.ID === 1 ? BetSizeValue1 : BetSizeValue2;
+    let  inputArea= this.ID === 1 ? inputBetBlockSize1 : inputBetBlockSize2;
+
+    let newValue = getFormattedNumber(value);
+    divArea.innerHTML = newValue;
+    inputArea.value = newValue;//TODO изменить значение в DOM
+  }
+  else if(eventName === 'buttonStatusChanged')
+  {
+    if(DEV_MODE) console.info('В КЛАССЕ ----(buttonStatusChanged)---- ' + value);
+    changeBetButtonsClass(this.ID, value); //вызываем изменение кнопки
+  }
+  else if(eventName === 'lastWinChanged') //Работаем с блансом, плавно увеличиваем значение
+  {
+   UserInfo.balanceValue += value; 
+   this._lastWin = 0;
+  }
+}
+
+  // Метод для обновления выигрыша
+  set winAmount(amount) {
+    this._winAmount = amount;    
+    if(this._showNotifyWin) this._showNotifyWin(amount);
+  }
+  get winAmount() {
+    return this._winAmount;
+  }
+
+  
+}
+
+
 const parrentDivBlock = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-hlLBRy.iJgxSt.sc-iQAVnG.kKKKp > div.sc-eKJbhj.kBa-DMh");
 const flyerDshboad = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO > div > div");
 const flyaway = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO > div > div > div.sc-dmctIk.Gmsrf");
@@ -11,51 +144,222 @@ const jumpLine1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.s
 const jumpLine2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO > div > div:nth-child(1) > div.sc-fnGiBr.gpBElz > div.sc-eDWCr.iiOtUt > svg > g > path:nth-child(2)");
 const notifyWin = document.querySelector("#mobile > div.sc-lhlUkk.aBbyI");
 const balanceHtml = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-cqQeAO.kvGivG > div > div > div.sc-iAEawV.bjXaQD.sc-AHaJN.sc-EJAja.lioyCd.jGycXN > button > div > div");
-const currentWinInButton = document.querySelector("#make-bet-button > div > div.currentWin.zabratX");
+let currentWinInButton = document.querySelector("#make-bet-button > div > div.currentWin.zabratX");
 
 
 
 // 1 окно управления ставкой
-let BetSizeValue1 = document.querySelectorAll('#bet-amount-mobile-input')[0];
-BetSizeValue1.addEventListener('input', () =>  
+let inputBetBlockSize1 = document.querySelectorAll('#bet-amount-mobile-input')[0]; // Цифра ставки в 1 блоке
+let inputBetBlockSize2 = document.querySelectorAll('#bet-amount-mobile-input')[1]; // Цифра ставки в 2 блоке
+let BetSizeValue1 = document.querySelectorAll('#bet-size > div:nth-child(1)')[0]; // Цифра ставки в 1 блоке
+let BetSizeValue2 = document.querySelectorAll('#bet-size > div:nth-child(1)')[1]; // Цифра ставки в 2 блоке
+
+// Создаём элементы класса для блоков
+const BetBlock1 = new BetBlock(10.00,1);
+const BetBlock2 = new BetBlock(10.00,2);
+
+inputBetBlockSize1.addEventListener('oninput', () =>
 {
-  BetSize = parseFloat(BetSizeValue1.value);
+  if (DEV_MODE) console.info('ТУТ 23|| ' + inputBetBlockSize1.value);
+  updateBetSizeValue(BetBlock1);
 });
+
+//onchange
+inputBetBlockSize1.addEventListener('change', () =>{
+  updateBetSizeValue(BetBlock1);
+});
+
+inputBetBlockSize1.addEventListener('click', () =>{
+  if (DEV_MODE) console.info('CKIIICK');
+  BetSizeValue1.style.opacity = 0;
+});
+
+inputBetBlockSize1.addEventListener('onchange', () =>{
+  updateBetSizeValue(BetBlock1);
+  BetSizeValue1.style.opacity = 1;
+});
+
+
+
+
+//БЛОК ВТОРОЙ МЕНЮШКИ
+//переделать под 2 версию
+inputBetBlockSize2.addEventListener('oninput', () =>
+{
+  if (DEV_MODE) console.info('ТУТ 51|| ' + inputBetBlockSize2.value);
+  updateBetSizeValue(BetBlock2);
+});
+
+//onchange
+inputBetBlockSize2.addEventListener('change', () =>{
+  updateBetSizeValue(BetBlock2);
+});
+
+inputBetBlockSize2.addEventListener('click', () =>{
+  if (DEV_MODE) console.info('CKIIICK');
+  BetSizeValue2.style.opacity = 0;
+});
+
+inputBetBlockSize2.addEventListener('onchange', () =>{
+  BetSizeValue2.style.opacity = 1;
+  updateBetSizeValue(BetBlock2);
+});
+
+
+function makeNotifyWinVisible(visible, time = 400,nubmerOfCounter = 1)
+{
+  let startTime;
+  // Функция для анимации
+  const animate = (timestamp) =>
+  {
+    if (!startTime) startTime = timestamp;
+    const progress = (timestamp - startTime) / time;
+    if (visible)
+    {
+      const opacity = Math.min(progress, 1); // Устанавливаем прозрачность от 0 до 1
+      const translateY = Math.min(100 * progress, 100); // Перемещаем от 0 до 100px по Y
+      notifyWin.style.opacity = opacity;
+      notifyWin.style.transform = `translateY(${ translateY+30 }px)`;
+      if (progress < 1)
+      {
+        // Продолжаем анимацию, если прогресс меньше 1
+        requestAnimationFrame(animate);
+      }
+    } else
+    {
+      const opacity = Math.max(1 - progress, 0); // Устанавливаем прозрачность от 1 до 0
+      const translateY = Math.max(100 - 100 * progress, 0); // Перемещаем от 100 до 0px по Y
+      notifyWin.style.opacity = opacity;
+      notifyWin.style.transform = `translateY(${ translateY+30 }px)`;
+      if (progress < 1)
+      {        // Продолжаем анимацию, если прогресс меньше 1
+        requestAnimationFrame(animate);
+      }
+      // Если нужно сделать не видимым, можно добавить здесь код для обратной анимации
+    }
+  };
+  requestAnimationFrame(animate);
+}
+
+function getFormattedNumber(value) //getFormattedNumber
+{ 
+  let result = '';
+   //Если значение больше 1000, то делим rezult должен ставить '&nbsp;' после тысячной части
+  if (value >= 1000)
+  {
+    let str = value.toString();
+    if(str.length > 3)
+    {
+      let index = str.length - 3;
+      let part1 = str.substring(0, index);
+      let part2 = str.substring(index);
+      result = part1 + ' ' + part2;
+      return result;
+    }    
+  }
+  else return value;
+}
+
+/** 
+ * @param {BetBlock} bBlock //какой блок используется
+ */
+function updateBetSizeValue(bBlock) //обновляем значение Блоков в классе
+{
+  if (DEV_MODE) console.info('==========updateBetSizeValue===========');
+  // Определяем, какое поле ввода используется, и соответствующее начальное значение
+  let inputBetSizeArea = bBlock.ID === 1 ? inputBetBlockSize1 : inputBetBlockSize2;
+  if (DEV_MODE) console.info('ЗНАЧЕНИЕ БЛОКА inputBetSizeArea' + inputBetSizeArea.value + '  <<<');
+  bBlock.sizeBet = parseFloat(inputBetSizeArea.value.replace(/\s/g, '')  || 0); // Преобразуем введённое значение в число
+  if (DEV_MODE) console.info('ОБНОВИЛИ ЗНАЧЕНИЕ БЛОКА ID' + bBlock.ID + ' НА ' + bBlock.sizeBet);
+  if (DEV_MODE) console.info('::::::::::::updateBetSizeValue::::::::::::');
+}
+
+/**
+ * Изменение назмера ставки.
+ * @param {symbol} char какое дейсвие + -.
+ * @param {number} value Значение кнопки.
+ * @param {BetBlock} bBlock Номер блока 1 2 3-оба сразу 
+ */
+function BetSizeChange(char = '+', value, bBlock) 
+{
+
+  if(DEV_MODE) console.info('-------------BetSizeChange--------------');
+  if(DEV_MODE) console.info('---------bBlock.ID ' + bBlock.ID+'---------');  
+  if(DEV_MODE) console.info('Старое значение bBlock.BetSize ' + bBlock.sizeBet);
+  // Проверяем, является ли value числом и больше нуля
+  if (typeof value !== 'number' || value <= 0) 
+  {
+    console.error('Value должно быть положительным числом');
+    return;
+  }
+
+  // Изменяем размер ставки
+  if (char === '+')       {
+   let oldValue = bBlock.sizeBet;
+   bBlock.sizeBet = oldValue + value;  
+  }
+  else if (char === '-')  bBlock.sizeBet -= value;
+
+
+  if(DEV_MODE) console.info('Новое значение BetSize ' + bBlock.sizeBet);
+  // Обновляем значение в поле ввода
+  var event = new Event('change');
+  //inputBetSizeArea.dispatchEvent(event);
+
+}
 
 
 //СТАВКА
 const betButton1 = document.querySelectorAll("#make-bet-button > div")[0];
-betButton1.addEventListener('click', () => makeBet(1));
+betButton1.addEventListener('click', () => makeBet(BetBlock1));
 
 const PlusButton1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-gJqSRm.fFHqHx > div:nth-child(3) > button > div");
-PlusButton1.addEventListener('click', () => BetSizeChange('+', 10, 1));
+PlusButton1.addEventListener('click', () => BetSizeChange('+', 10, BetBlock1));
 
 const MinusButton1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-gJqSRm.fFHqHx > div:nth-child(1) > button");
-MinusButton1.addEventListener('click', () => BetSizeChange('-', 10, 1));
+MinusButton1.addEventListener('click', () => BetSizeChange('-', 10, BetBlock1));
 
 const Plus50Button1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(1) > button");
-Plus50Button1.addEventListener('click', () => BetSizeChange('+', 50, 1));
+Plus50Button1.addEventListener('click', () => BetSizeChange('+', 50, BetBlock1));
 
 const Plus100Button1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(2)");
-Plus100Button1.addEventListener('click', () => BetSizeChange('+', 100, 1));
+Plus100Button1.addEventListener('click', () => BetSizeChange('+', 100, BetBlock1));
 
 const Plus200Button1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(3) > button");
-Plus200Button1.addEventListener('click', () => BetSizeChange('+', 200, 1));
+Plus200Button1.addEventListener('click', () => BetSizeChange('+', 200, BetBlock1));
 
 const Plus500Button1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(4) > button");
-Plus500Button1.addEventListener('click', () => BetSizeChange('+', 500, 1));
+Plus500Button1.addEventListener('click', () => BetSizeChange('+', 500, BetBlock1));
 
 // 2 окно управления ставкой
-let BetSizeValue2 = document.querySelectorAll('#bet-amount-mobile-input')[1];
 const betButton2 = document.querySelectorAll("#make-bet-button > div")[1];
-betButton2.addEventListener('click', () => makeBet(2));
+betButton2.addEventListener('click', () => makeBet(BetBlock2));
+
+const PlusButton2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(2) > div.sc-ikHGee.eWVHSl > div > div.sc-gJqSRm.fFHqHx > div:nth-child(3) > button");
+PlusButton2.addEventListener('click', () => BetSizeChange('+', 10, BetBlock2));
+
+const MinusButton2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(2) > div.sc-ikHGee.eWVHSl > div > div.sc-gJqSRm.fFHqHx > div:nth-child(1) > button");
+MinusButton2.addEventListener('click', () => BetSizeChange('-', 10, BetBlock2));
+
+const Plus50Button2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(2) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(1) > button");
+Plus50Button2.addEventListener('click', () => BetSizeChange('+', 50, BetBlock2));
+
+const Plus100Button2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(2) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(2)");
+Plus100Button2.addEventListener('click', () => BetSizeChange('+', 100, BetBlock2));
+
+const Plus200Button2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(2) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(3) > button");
+Plus200Button2.addEventListener('click', () => BetSizeChange('+', 200, BetBlock2));
+
+const Plus500Button2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(2) > div.sc-ikHGee.eWVHSl > div > div.sc-evzXkX.bOKBzH > div:nth-child(4) > button");
+Plus500Button2.addEventListener('click', () => BetSizeChange('+', 500, BetBlock2));
 
 
+//DEVMODE ********************************************************************************************************************
+const DEV_MODE = true; // Режим разработчика (Вывод в консоль)
 
+// Очередь чисел
+let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
 
-
-
-// #make-bet-button
 // Глобальные переменные для координат
 let Xg = -95; // Начальное значение X
 let Yg = 90;  // Начальное значение Y
@@ -67,92 +371,145 @@ let centerOfJetPack = curX.offsetLeft + 60; // Центральная точка
 
 //Флаги состояний для функций анимаций
 let isMotionJetPackActive = false;
+let isNumberActive = false;
 let isFlyawayActive = false;
 let isWaitingProgressBarActive = false;
 let isNotifyWinActive = false;
-let canBetToThisRound = false; //Флаг для индикации вовремя ли ставка. TRUE - МОЖНО ДЕЛАТЬ СТАВКУ, FALSE - НЕЛЬЗЯ ДЕЛАТЬ СТАВКУ
-
-// Флаги для проверки взаимодействия с пользователем
-let isBetInTime = false; // Если ставка сделана вовремя, то она вычисляется выйгрыш относительно коэффициента
-let BetSize = 10.00;
-
-let balanceValue = 500.01; // Баланс пользователя
-
 /**
- * Изменение операции с балансом
- * @param {boolean} operation какое дейсвие true + | false -.
- * @param {number} value размер проигрыша или выйгрыша 
+ * СТатус приёма заявок на раунд. TRUE - МОЖНО ДЕЛАТЬ СТАВКУ, FALSE - НЕЛЬЗЯ ДЕЛАТЬ СТАВКУ
  */
-function updateBalance(operation, value)
-{
-  value = parseFloat(value.toFixed(2));
-  if (operation) balanceValue += value;
-  else balanceValue -= value;
-    
-  balanceHtml.textContent = `${ (balanceValue.toFixed(2)) } ₽`;
+let canBetToThisRound = false; 
+let currentNumber = 1.0; // Начальное значение
 
-  //TODO добавить обновление баланса при начале раунда
-  //TODO добавить обновление баланса при выйгрыше - в calculate WIN
-}
-
-/**
- * Изменение назмера ставки.
- * @param {symbol} char какое дейсвие + -.
- * @param {number} value Значение кнопки.
- * @param {number} nubmerOfCounter Номер блока 1 2 3-оба сразу 
- */
-function BetSizeChange(char = '+', value, nubmerOfCounter = 1) 
-{
-  if (char === '+') BetSize += value;
-  else if (char === '-')
-  {
-    BetSize -= value;
-  }
-  if (BetSize < 10) BetSize = 10;
-  BetSizeValue1.value = BetSize + ' ₽';
-}
-
+updateBetSizeValue(BetBlock1);
+updateBetSizeValue(BetBlock2);
+//let nubmerOfCounterBlockOfBet = 0; //TODO - определить какой блок ставки был использован 0 = не использован, 1 = первый блок, 2 = второй блок, 3 = оба блока
 // USER VARIABLES
-let isUserMadeBet = false; // Чекаем на ставку
-let UserBetSize = 0.001;
 
-let queueOfX = [1.54, 12.28, 1.16, 30.39]; // Заранее заданный список чисел
+const UserInfo = {
+  _balanceValue: 500.001, // Начальный баланс пользователя
+  animationFrameId: null, // ID текущей анимации для возможности её отмены
+
+  set balanceValue(newValue) {
+    // Отменяем предыдущую анимацию, если она была запущена
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+    this.animateBalanceChange(newValue);
+  },
+  
+  get balanceValue() {
+    return this._balanceValue;
+  },
+
+  animateBalanceChange(newValue) {
+    const duration = 500; // Длительность анимации в миллисекундах
+    const startValue = this._balanceValue;
+    const change = newValue - startValue; // Общее изменение, которое нужно анимировать
+    let startTime = null;
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const elapsedTime = timestamp - startTime;
+      const progress = Math.min(elapsedTime / duration, 1); // Прогресс от 0 до 1
+
+      // Вычисляем текущее значение для анимации
+      this._balanceValue = startValue + change * progress; // Обновляем напрямую _balanceValue
+      balanceHtml.textContent = `${this._balanceValue.toFixed(2)} ₽`;
+
+      if (progress < 1) {
+        this.animationFrameId = requestAnimationFrame(animate);
+      } else {
+        this._balanceValue = newValue; // Устанавливаем точное конечное значение
+        balanceHtml.textContent = `${this._balanceValue.toFixed(2)} ₽`;
+        this.animationFrameId = null; // Сброс ID анимации
+      }
+    };
+
+    this.animationFrameId = requestAnimationFrame(animate);
+  }
+};
+
+
+
+
+/**
+ * Изменение баланса пользователя.
+ * @param {boolean} operation какое действие true (+) | false (-).
+ * @param {BetBlock} betBlock объект ставки, содержащий размер выигрыша или проигрыша.
+ */
+function updateBalance(operation, betBlock) {
+  // TODO: Добавить обновление баланса при начале раунда
+  // TODO: Добавить обновление баланса при выигрыше - в функции calculateWin
+
+
+  // Преобразуем размер ставки пользователя к числу с двумя знаками после запятой
+  if (DEV_MODE) console.info('betBlock.UserBetSize  '+ betBlock.UserBetSize);
+  if (DEV_MODE) console.info('*************updateBalance*****************');
+  const value = parseFloat(betBlock.UserBetSize.toFixed(2));
+
+  // Изменяем баланс пользователя в зависимости от операции
+  if (operation) {
+    UserInfo.balanceValue += value;
+  } else {
+    UserInfo.balanceValue -= betBlock.UserBetSize;
+  }
+
+  // Обновляем отображение баланса пользователя на странице
+  //balanceHtml.textContent = `${UserInfo.balanceValue.toFixed(2)} ₽`;
+}
+
+
 
 /**
  * Процесс соверщения ставки.
- * @param {symbol} btnNumber нужно для измения состояния кнопки
+ * @param {BetBlock} Block нужно для изменения состояния кнопки (1 или 2 для betBlock1 или betBlock2)
  */
-function makeBet(btnNumber = 1) 
+function makeBet(Block)
 {
-  console.info('makeBet');
-  console.info('isUserMadeBet ' + isUserMadeBet);
-  console.info('isBetInTime ' + isBetInTime);
-  console.info('UserBetSize ' + UserBetSize);
-
-  if (!isUserMadeBet && !isBetInTime) // Ставка не сделана и не вовремя > ставим ставку в очередь
+  if (DEV_MODE) console.info('*************makeBet*****************');
+//disableAllButtons(Block.ID, true); // Делаем кнопки недоступными
+/**
+ * Проверка на возможность сделать ставку
+ */
+ if(Block.isMadeBetToThisRound) // Если ставка уже сделана > Забираем выйгрыщ
+ {
+  if (DEV_MODE) console.info('Если ставка уже сделана > Забираем выйгрыш');
+  Block.isMadeBetToThisRound = false;
+  calculateWin(Block);
+  Block.UserBetSize = 0; // Обнуляем размер ставки
+  Block.buttonStatus = 'gTqZvy'; // Возвращаем кнопку в исходное состояние  
+ }
+ else if(Block.isBetToNextRound) // Если ставка сделана на следующий раунд > Отменяем
+ {
+  if (DEV_MODE) console.info('Если ставка сделана на следующий раунд > Отменяем');
+  Block.isBetToNextRound = false;  
+  Block.UserBetSize = 0; // Обнуляем размер ставки
+  Block.buttonStatus = 'gTqZvy'; // Возвращаем кнопку в исходное состояние
+ }
+ else if(!Block.isMadeBetToThisRound && !Block.isBetToNextRound) //Если ставка не сделана и нет на следующий раунд > ставим ставку
+ {
+  if (DEV_MODE) console.info('Если ставка НЕ сделана на следующий раунд > ставим ставку');
+  if (DEV_MODE) console.info('Block.sizeBet : ' + Block.sizeBet);
+  Block.isBetToNextRound = true;
+  Block.UserBetSize = Block.sizeBet; // Устанавливаем размер ставки
+  Block.buttonStatus = 'otmenit'; // Меняем статус кнопки
+ }
+  else
   {
-    //Делаем СТАВКУ
-    isBetInTime = canBetToThisRound; // Статус вовремя ставка или на след рауд true = вовремя, false = на след раунд
-    isUserMadeBet = true;
-    UserBetSize = BetSize;
-    changeBetButtonsClass(btnNumber, 'otmenit');    // Применяем класс "Ставка" к первой кнопке    
+    if (DEV_MODE) console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    if (DEV_MODE) console.info('Ставка не сделана');
+    if (DEV_MODE) console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
   }
-  else if (isUserMadeBet && isBetInTime) // Если юзер СДЕЛАЛ ставку и ставка сделана вовремя > кнопка получения выйгрыша
-  { //ЗАБИРАЕМ ВЫЙГРЫШ
-    console.info('ЗАБИРАЕМ ВЫЙГРЫШ');
-    isUserMadeBet = false;
-    isBetInTime = false;
-    calculateWin();
-    //UserBetSize = 0.2;
-    changeBetButtonsClass(btnNumber, 'gTqZvy');    // Меняем состояние кнопки на "Ставка"
+  
+  if (DEV_MODE)
+  {
+    console.info('isMadeBetToThisRound ' + Block.isMadeBetToThisRound);
+    console.info('isBetToNextRound ' + Block.isBetToNextRound);
+    console.info('UserBetSize ' + Block.UserBetSize);
   }
-  else if (isUserMadeBet && isBetInTime && canBetToThisRound) // Если ставка сделана и вовремя и сейчас не можно делать ставку > отменяем ставку
-  { //ОТМЕНЯЕМ СТАВКУ
-    isUserMadeBet = false;
-    changeBetButtonsClass(btnNumber, 'gTqZvy');    // Применяем класс "Ставка" к первой кнопке
-  }
-
 }
+
 
 // Оживляем JetPack
 function motionJetPack(command)
@@ -171,7 +528,7 @@ function motionJetPack(command)
 
   // Анимация началась
   isMotionJetPackActive = true;
-  //console.info('motionJetPack ИДЁТ АНИМАЦИЯ' );
+  //if(DEV_MODE) console.info('motionJetPack ИДЁТ АНИМАЦИЯ' );
 
   AllJettPak.style.opacity = '1';
   JetPak.style.opacity = "1";
@@ -197,7 +554,7 @@ function motionJetPack(command)
   //jumpLine2.setAttribute('d', newD + ` L ${ 250.3749941963826 + newX } 196 Z`);
   var newX = Xg - 70 * 2.5;
   var newY = Yg + 20;
-  // console.info('newY ' + newY);
+  // if(DEV_MODE) console.info('newY ' + newY);
   var newD = `M -95 190 Q ${ 167 + newX } 190 ${ 250 + newX } ${ newY }`;
   jumpLine1.setAttribute('d', newD); // Обновляем атрибут 'd' для первой линии
   jumpLine2.setAttribute('d', newD + ` L ${ 250 + newX } 190 Z`); // Обновляем атрибут 'd' для второй линии
@@ -222,20 +579,14 @@ async function StartJetPack(coefficientX)
 
   // Теперь мы уверены, что другие анимации завершены
   isMotionJetPackActive = true;
-  //console.info('StartJetPack ВЗЛЁТ АНИМАЦИЯ' );
-
-
-
-
+  
   Xg = -95; // Начальное значение X
   Yg = 90;  // Начальное значение Y 90
 
   // Рассчитываем процент выполнения анимации на основе коэффициента X
-
   let completionPercentage = (coefficientX - 1.0) / 0.3; // 0,10
   if (completionPercentage >= 1) completionPercentage = 1;
-  //let targetX = -95 + (200 + 95) * completionPercentage; // Целевая позиция X в зависимости от процента выполнения
-  //centerOfJetPack
+
   let targetX = (centerOfJetPack + 43) * completionPercentage; // Целевая позиция X в зависимости от процента выполнения
   setElementOpacity(JetPak, '1');
   setElementOpacity(AllJettPak, '1');
@@ -255,7 +606,7 @@ async function StartJetPack(coefficientX)
       // Обновляем координаты для анимаций прыжка
       var newX = Xg - 70 * 2.5;
       var newY = Yg + 20; //20
-      //console.info('newY ' + newY);
+      //if(DEV_MODE) console.info('newY ' + newY);
       var newD = `M -95 190 Q ${ 167 + newX } 190 ${ 250 + newX } ${ newY }`;
       jumpLine1.setAttribute('d', newD); // Обновляем атрибут 'd' для первой линии
       jumpLine2.setAttribute('d', newD + ` L ${ 250 + newX } 190 Z`); // Обновляем атрибут 'd' для второй линии
@@ -284,26 +635,39 @@ async function StartJetPack(coefficientX)
 
 // Функция для "улетания" JetPack
 async function flyawayJetPack(X)
-{
+{  
+  if (isUserMadeBet()) // если ставка была, то она сгорела
+  {
+    if (DEV_MODE) console.info("СДЕЛАЛИ КНОПКИ Ставка")
+    let allBets = checkAndGetBetBlocks('isMadeBetToThisRound'); // Сбрасываем флаг ставки
+
+    if(allBets !== null && allBets.length > 0)
+    {
+      /**
+      * 
+      * @param {BetBlock} element
+      * */
+      allBets.forEach(element => {
+        if(!element.isMadeInTime) //Если ставка сделана вовремя, то сбрасываем её - так-как раунд сгорел
+        {
+          element.UserBetSize = 0;
+          //TODO - сделать функцию для сброса ставки
+          element.isMadeBetToThisRound = false;  
+          element.buttonStatus = 'gTqZvy'; // Меняем состояние кнопки на "Ставка"    
+        }
+        
+        
+      });
+    }
+
+  }
+
+
   // Корректируем последнее значение, чтобы точно соответствовать цели
   curX.textContent = parseFloat(X).toFixed(2);
   parrentDivBlock.prepend(createClass(X)); // Добавляем новый блок с числом в верхнюю часть экрана
-  if (isUserMadeBet) // если ставка была, то она сгорела
-  {
-    isUserMadeBet = false;
-    isBetInTime = false;
-    // делаем кнопку ставка
+  
 
-  }
-
-
-  if (X > 1.0 && isUserMadeBet)
-  {
-    if (isBetInTime) UserBetSize = 0; // Сбрасываем ставку, если она была сделана вовремя
-    else isBetInTime = true; // Если ставка не была сделана вовремя, то устанавливаем флаг, что теперь она активна, это нужно чтобы в начале рауда изменить кнопку на "Забрать"
-    // Если значение больше 1.1, то это выигрыш
-    // calculateWin(); // Вызываем функцию для расчёта выигрыша
-  }
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
   if (isWaitingProgressBarActive) await waitForAnimationToComplete('isWaitingProgressBarActive');
@@ -347,41 +711,42 @@ async function flyawayJetPack(X)
     }
   }
   animateFlyAway();
-  ////console.info('flyawayJetPack'); 
+  ////if(DEV_MODE) console.info('flyawayJetPack'); 
 }
 
-
-function calculateWin()
+/**
+ * 
+ * @param {BetBlock} block 
+ */
+function calculateWin(block) //TODO - добавить обновление баланса при выйгрыше
 {
   setElementOpacity(Waiting, '0');
-  setElementOpacity(notifyWin, '1');
-
   let XNow = parseFloat(curX.textContent);
-  let win = UserBetSize * XNow; //TODO - calculate win  
-  win = parseFloat(win.toFixed(2));//win нужно округлить до 2 числе после знака
-  console.info("win: " + win);
-  console.info("UserBetSize: " + UserBetSize);
-  updateBalance(true, win); //TODO - добавить обновление баланса при выйгрыше
 
-  console.info("XNow: " + XNow);
-  console.info("win: " + win);
+  let localBetSize = block.UserBetSize; //TODO - определить размер ставки
+  let win = localBetSize * XNow; //TODO - calculate win  
+  win = parseFloat(win.toFixed(2));//win нужно округлить до 2 числе после знака
+  block.lastWin = win; //Произойдёт автоматический расчёт баланса
+
+
+  if (DEV_MODE) console.info("Win: " + win);
+  if (DEV_MODE) console.info("UserBetSize: " + localBetSize);
+  if (DEV_MODE) console.info("XNow: " + XNow);
+
+  //TODO СДЕЛАТЬ ПОД ДВОЙНОЙ X
   notifyWin.children[0].children[0].children[1].textContent = 'x' + XNow;  //notification
-  notifyWin.children[0].children[1].children[0].textContent = `${win} ₽`; // how much money is raised
-  setElementOpacity(notifyWin, '1');
-  setElementOpacity(parrentDivBlock, '0');
+  notifyWin.children[0].children[1].children[0].textContent = `${ win } ₽`; // how much money is raised
+  makeNotifyWinVisible(true);
+
 
   //Убрать уведомление о выйгрыше
   setTimeout(() =>
   {
-    setElementOpacity(notifyWin, '0');
+    makeNotifyWinVisible(false);
   }, 5000);
-
-
-  //TODO добавить в FLYAway изменение кнопки, если юзер сделал ставку
-
-
 }
-// Есть 2 блока. Находятся друг над другом, при увеличении окна делать так, чтобы они разъезжались и были параллельно. 
+
+
 
 /* //работа с WEB-сокетами
 var ws = new WebSocket("ws://localhost:8765");
@@ -393,29 +758,16 @@ ws.onopen = function ()
 
 async function WaitingProgreesBar() //Ждём следующего раунда
 {
+  canBetToThisRound = true; // Приём заявок на раунд активен 
+  isWaitingProgressBarActive = true; // Устанавливаем флаг активности анимации
+
   let x = null; // Генерируем новое число
-
-  //Если ставка сделана, то меняем кнопку на ожидание на момент загрузки, потом поменяем на "Забрать"
-  canBetToThisRound = true; // Вовремя начала раунда, ставки идут на следующий раунд
-  if (!isBetInTime && isUserMadeBet) 
-  {
-    changeBetButtonsClass(1, 'ozgidanie'); // Применяем класс "Ставка" к первой кнопке    
-    updateBalance(false, BetSize); //обновление баланса при проигрыше
-  }
-
-  //ws.send("generate");
-
-  if (isUserMadeBet && !isBetInTime)
-  {
-    isBetInTime = true; // Если ставка была сделана до начала раунда, то она считается вовремя
-    // выигрыш будет учитываться
-  }
-
+  //x = generateWeightedNumber(true); // Генерируем новое число true - работа с очередью
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
   if (isWaitingProgressBarActive) await waitForAnimationToComplete('isWaitingProgressBarActive');
 
-  isWaitingProgressBarActive = true;
+  
   setElementOpacity(JetPak, '0');
   setElementOpacity(AllJettPak, '0');
   setElementOpacity(notifyWin, '0');
@@ -427,33 +779,60 @@ async function WaitingProgreesBar() //Ждём следующего раунда
     waitNextRound.children[2].children[0].style.width = `${ end }%`;
     if (end == 50) 
     {
-      /* //работа с WEB-сокетами
-      ws.send("generate");
-      /ws.onmessage = function (event) 
-      {
-        console.log("Получено сообщение: " + event.data);
-        x = event.data;
-        console.log("XONE: " + x);
-      };
-      */
-      x = generateWeightedNumber(true); // Генерируем новое число true - работа с очередью
+      x = generateWeightedNumber(true); // Генерируем новое число true - работа с очередью      
     }
+    else if (end == 25 && isUserMadeBet())    // Если осталось 20% времени до следующего раунда
+    {
+      if(DEV_MODE) console.info('==============25================');
+      if (canBetToThisRound) // Делаем все ставки которые были в очереди > активными
+      {                
+        let blocks = checkAndGetBetBlocks('isBetToNextRound'); // Получаем все блоки в которых есть ставки на следующий раунд
+        if(blocks !== null)
+        {
+          blocks.forEach(element => {
+           // element.isBetToNextRound = false; // Ставка сделана вовремя
+           // element.isMadeBetToThisRound = true; // Ставка сделана вовремя
+            
+            element.buttonStatus = 'ozgidanie'; // Меняем состояние кнопки на "Забрать"
+            disableAllButtons(element.ID, true); // Делаем кнопки доступными
+          });
+        }
+        else
+        {
+          if(DEV_MODE) console.info('blocks === null');
+        }
+        
+      }
+    }
+    else if (end == 5) // Если осталось 5% времени до начала раунда
+    {
+      canBetToThisRound = false; // Приём заявок на раунд закрыт
+    }
+   
   }
   setElementOpacity(waitNextRound, '0');
-
   setElementOpacity(Waiting, '1');
 
-  isWaitingProgressBarActive = false;
-
-
-
+  isWaitingProgressBarActive = false; // Сбрасываем флаг активности анимации
 
   setTimeout(() =>
   {
+    
+    let blocks = checkAndGetBetBlocks('isBetToNextRound'); // Получаем все блоки в которых есть ставки на следующий раунд
+        if(blocks !== null)
+        {
+          blocks.forEach(element => {
+            element.isBetToNextRound = false; // Ставка сделана вовремя
+            element.isMadeBetToThisRound = true; // Ставка сделана вовремя
 
-    console.log("x: " + x);
-    animateNumber(x); //TODO - Добавить анимацию появления нового раунда и Генерацию рандомного значения    
-    //let x = generateWeightedNumber(); // Генерируем новое число    
+            UserInfo.balanceValue -= element.UserBetSize; // Обновляем баланс пользователя
+            
+            element.buttonStatus = 'zabrat'; // Меняем состояние кнопки на "Забрать"
+            disableAllButtons(element.ID, true); // Делаем кнопки доступными
+          });
+          console.log("x: " + x);
+          animateNumber(x); //Начать новый раунд   
+        }    
   }, 2000);
   return;
 }
@@ -461,7 +840,10 @@ async function WaitingProgreesBar() //Ждём следующего раунда
 
 
 
-
+/**
+ * Создаёт новый блок с прошлым значением X и добавляет его в верхнюю часть экрана.
+ * @param {*} value  * 
+ */
 function createClass(value)
 {
   let type;
@@ -486,7 +868,11 @@ function createClass(value)
 }
 
 
-//Функция для изменения видимости
+/**
+ * Изменение видимости элемента
+ * @param {*} element 
+ * @param {*} opacityValue 
+ */
 function setElementOpacity(element, opacityValue)
 {
   element.style.opacity = opacityValue;
@@ -494,7 +880,11 @@ function setElementOpacity(element, opacityValue)
 
 
 
-// Функция для генерации следующего числа
+/**
+ * Функция для генерации следующего числа
+ * @param {boolean} useAlternative  Флаг для выбора числа из списка, а не генерации
+ * @returns 
+ */ 
 function generateWeightedNumber(useAlternative = false)
 {
   const max = 100;
@@ -513,8 +903,54 @@ function generateWeightedNumber(useAlternative = false)
   }
 }
 
+
+/**
+ * Функция которая делает все button и input неактивными (disabled)
+ * @param {BetBlock.ID} numberBlock нужно для изменения состояния кнопки (1 или 2 для betBlock1 или betBlock2)
+ * @param {boolean} isDisabled true - делаем кнопки неактивными, false - делаем кнопки активными
+ */
+function disableAllButtons(numberBlock, isDisabled) 
+{
+  // Получаем блоки по условию
+  const betBlock1 = numberBlock === 1 || numberBlock === 0 ? document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1)") : null;
+  const betBlock2 = numberBlock === 2 || numberBlock === 0 ? document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(2)") : null;
+
+  function disableAllElements(elements, isDisabled) {
+    elements.forEach(element => {
+      if (element.id !== 'make-bet-button' && !element.classList.contains("zabrat")) { // Проверяем, что id элемента не 'make-bet-button' и не zabratX
+        if (isDisabled) element.setAttribute('disabled', ''); // Делаем элемент недоступным
+        else element.removeAttribute('disabled'); // Делаем элемент доступным
+      }
+    });
+  }
+    
+    // Получаем все кнопки и инпуты для каждого блока
+    if (betBlock1) {
+      const buttonsOfBlock1 = betBlock1.querySelectorAll('button');
+      const inputsOfBlock1 = betBlock1.querySelectorAll('input');
+      disableAllElements([...buttonsOfBlock1, ...inputsOfBlock1], isDisabled);
+    }
+    
+    if (betBlock2) {
+      const buttonsOfBlock2 = betBlock2.querySelectorAll('button');
+      const inputsOfBlock2 = betBlock2.querySelectorAll('input');
+      disableAllElements([...buttonsOfBlock2, ...inputsOfBlock2], isDisabled);
+    }
+}
+
+
+
+/**
+ * Меняет класс кнопок ставки.
+ * @param {number} numberButton Номер кнопки (1 или 2) или 0 для всех кнопок
+ * @param {string} className Статус кнопки (gTqZvy, zabrat, ozgidanie, otmenit)
+ */
 function changeBetButtonsClass(numberButton, className)
 {
+  if(DEV_MODE) console.info('*************changeBetButtonsClass*****************');
+  if(DEV_MODE) console.info('numberButton ' + numberButton);
+  if(DEV_MODE) console.info('className ' + className);
+  if(DEV_MODE) console.info('*************changeBetButtonsClass*****************');
   // Определение классов и соответствующих цветов
   const classes = ["gTqZvy", "zabrat", "ozgidanie", "otmenit"];
   const classToColor = {
@@ -534,127 +970,141 @@ function changeBetButtonsClass(numberButton, className)
   };
 
   function updateButtonClass(button)
-  {
-    // Удаляем предыдущие классы, чтобы избежать конфликтов
-    button.classList.remove(...classes);
-    // Добавляем новый класс
-    button.classList.add(className);
+  {    
+    button.classList.remove(...classes); // Удаляем предыдущие классы, чтобы избежать конфликтов    
+    button.classList.add(className); // Добавляем новый класс кнопке
+
     // Изменяем цвет псевдоэлемента '--after-color' родительского элемента
     const color = classToColor[className] || 'transparent'; // Если класс не определен, задаем transparent
     button.parentElement.style.setProperty('--after-color', color);
-    // Изменяем текст кнопки, если для класса определен текст
-    const buttonText = classToButtonText[className];
-    if (buttonText)
-    {
-      button.textContent = buttonText;
-    }
+    button.textContent = classToButtonText[className]; // Изменяем текст кнопки, если для класса определен текст
 
 
     // Добавление или обновление элемента с классом 'currentWin zabratX' при нажатии на кнопку "Забрать"
     if (className === 'zabrat') 
     {
       // Проверяем, существует ли уже элемент 'currentWin zabratX' в родительском элементе
-      let currentWin = button.parentElement.querySelector('.currentWin.zabratX');
+      let currentWin = button.parentElement.querySelector('currentWin.zabratX');
+      
       if (!currentWin)
       {
-        // Если элемент не найден, создаем его
+        if (DEV_MODE) console.info("СОЗДАЁМ ЭЛЕМЕНТ Для кнопки 'Забрать'")        
         currentWin = document.createElement('div');
+        //if (DEV_MODE) console.info(currentWin);
         currentWin.className = 'currentWin zabratX';
         currentWin.style.display = 'block'; // Убедитесь, что элемент видим
-        currentWin.textContent = '0.00'; // Установите значение или текст, который нужен
+        currentWin.textContent = '10.00'; // Установите значение или текст, который нужен
         button.prepend(currentWin); // Добавляем созданный элемент в кнопку
       }
-      else
-      {
-        // Если элемент уже существует, обновляем его содержимое
-        currentWin.textContent = '0.00'; // Обновите, если требуется
-      }
-      // Если элемент уже существует, можно обновить его содержимое или стили здесь
+      else currentWin.innerHTML = '0.00'; // Если элемент уже существует, обновляем его содержимое
     }
   }
 
-
-
-  // Предположим, что betButton1 и betButton2 определены где-то в вашем коде
-  if (numberButton === 1)
-  {
-    updateButtonClass(betButton1);
-  } else if (numberButton === 2)
-  {
-    updateButtonClass(betButton2);
-  } else if (numberButton === 0)
+  // Определяем, какую кнопку нужно обновить
+  if (numberButton === 1)       updateButtonClass(betButton1);
+  else if (numberButton === 2)  updateButtonClass(betButton2);
+  else if (numberButton === 0)
   { // Применяем для всех кнопок
     updateButtonClass(betButton1);
     updateButtonClass(betButton2);
   }
 }
 
-//changeBetButtonsClass(1, 'ozgidanie'); // Применяем класс "Ставка" к первой кнопке
 
+/**
+ * Проверяет, сделана ли ставка в любом из блоков.
+ * @returns {boolean} Возвращает true, если ставка была сделана в любом из блоков
+ */
+function isUserMadeBet() 
+{
+  // Проверяем, сделана ли ставка в любом из блоков на основе свойства isMadeBet
+  if (BetBlock1.isMadeBetToThisRound || BetBlock2.isMadeBetToThisRound) return true;
+  if (BetBlock1.isBetToNextRound || BetBlock2.isBetToNextRound) return true;
+  else return false;
+}
 
-let currentNumber = 1.0;
+/**
+ * Проверяет заданный параметр в объектах BetBlock1 и BetBlock2.
+ * Возвращает объекты, свойство param которых истинно.
+ * @param {string} param Имя параметра для проверки.
+ * @returns {Array} Массив BetBlock-ов .
+ */
+function checkAndGetBetBlocks(param = null) 
+{
+//if(DEV_MODE) console.info("==============checkAndGetBetBlocks=================");
+//if(DEV_MODE) console.info("ПОИСКИ : param = " + param);
+  const result = [];
+
+  if (param === null) return null; // Или return result, если вы хотите возвращать пустой массив вместо null
+  if (BetBlock1[param] === true) result.push(BetBlock1);
+  if (BetBlock2[param] === true) result.push(BetBlock2);
+
+  //if(DEV_MODE) console.info("РЕЗУЛЬТАТ ПОИСКА: param = " + param + " " + result.length);
+  //if(DEV_MODE) console.info("■■■■■■■■■■■■■■■checkAndGetBetBlocks■■■■■■■■■■■■■■■■");
+  return result.length > 0 ? result : null;
+}
 
 // Функция для анимации числа
 function animateNumber(targetX)
 {
-  const curX = flyaway.children[0]; // Элемент для отображения числа
-
-
   currentNumber = 1.0; // Начальное значение
   let step = 0.01; // Начальный шаг изменения числа
   let lastTimestamp = 0; // Время последнего обновления
   let updateInterval = 50; // Интервал обновления в миллисекундах
 
+  isNumberActive = true; // Устанавливаем флаг активации раунда
+
+  const curX = flyaway.children[0]; // Элемент для отображения числа  
+  var allBets = null
   //РАБОТА С ПОЛЬЗОВАТЕЛЕМ
-  if (isBetInTime && isUserMadeBet) changeBetButtonsClass(1, 'zabrat'); // Применяем класс "Ставка" к первой кнопке
+  if (isUserMadeBet()) 
+  {
+    // меняем кнопку взависимости от ставки в каждом из betBlock
+    allBets = checkAndGetBetBlocks('isMadeBetToThisRound');
+    if (DEV_MODE && allBets !== null) console.info("Количество blocks: " + allBets.length);
+    if (DEV_MODE) console.info("=============================================");
+  }
 
   StartJetPack(targetX);
   function updateNumber(timestamp)
   {
+    //if (DEV_MODE) console.info("targetX    " + targetX)
     if (!lastTimestamp) lastTimestamp = timestamp; // Инициализация времени последнего обновления
-    const elapsed = timestamp - lastTimestamp; // Вычисляем прошедшее время
-
-    // Обновляем число, если прошло достаточно времени
-    if (elapsed > updateInterval)
+    const elapsed = timestamp - lastTimestamp; // Вычисляем прошедшее время    
+    if (elapsed > updateInterval) // Обновляем число, если прошло достаточно времени
     {
       currentNumber += step;
       curX.textContent = currentNumber.toFixed(2);
 
-      // при начале раунда, если пользователь сделал ставку, то меняет display с none на block.
-      // в конце раунда, если пользователь сделал ставку, то меняет display с block на none.
-      if (isUserMadeBet && currentNumber <= 1.0)
-      {
-        changeBetButtonsClass(1, 'zabrat');
-        console.info("СДЕЛАЛИ КНОПКИ Забрать СТРОКА 628--------")
-      }
-      else if(isUserMadeBet && currentNumber > 1.3)
-      {
-        console.info("СТРОКА 632 "+ currentWinInButton.textContent);
-        //проверка currentWinInButton на существование 
-        if (currentWinInButton.textContent.length>1)
+      //////////////////
+      if(isUserMadeBet()) // Если ставка была, то обновляем её
+      {        
+        if (allBets !== null && allBets.length > 0)
         {
-          currentWinInButton.textContent = UserBetSize +' ₽';
-        } 
-        else 
-        {
-          console.info("ХУУУУЙ")
-          currentWinInButton = document.querySelector("#make-bet-button > div > div.currentWin.zabratX");
-          currentWinInButton.textContent = currentNumber +' ₽';
+          allBets.forEach(block =>
+          {
+            if (block.isMadeBetToThisRound)
+            {
+              if (block.ID === 1)
+              {
+                betButton1.firstChild.textContent = parseFloat(block.UserBetSize * currentNumber).toFixed(2) + ' ₽';
+              }
+              else if (block.ID === 2)
+              {
+                betButton2.firstChild.textContent = parseFloat(block.UserBetSize * currentNumber).toFixed(2) + ' ₽';
+              }
+            }
+          });
         }
-      
-        
       }
-
+      
+      /////////////////
       lastTimestamp = timestamp; // Обновляем время последнего обновления
 
       // Адаптируем шаг изменения числа
-      if (currentNumber < 1.10)
-      {
-        step = 0.005;
-      } else if (currentNumber < 2.0)
-      {
-        step = 0.009;
-      } else
+      if (currentNumber < 1.10) step = 0.005;
+      else if (currentNumber < 2.0)step = 0.009;
+      else
       {
         updateInterval = updateInterval - 0.01; // Уменьшаем интервал обновления для ускорения анимации
         step += 0.0001;
@@ -662,23 +1112,17 @@ function animateNumber(targetX)
     }
 
     // Продолжаем анимацию, пока не достигнем целевого значения
-    if (currentNumber < targetX)
-    { //Крутим
-      requestAnimationFrame(updateNumber);
-    } else if (currentNumber >= targetX && targetX > 1.2)
+    if (currentNumber < targetX) requestAnimationFrame(updateNumber);//ЛЕТИМ
+    else if (currentNumber >= targetX && targetX > 1.2)  //УЛЕТЕЛ
     {
-      changeBetButtonsClass(0, 'gTqZvy'); //Делаем все кнопки доступными к 
-      console.info("СДЕЛАЛИ КНОПКИ Ставка")
-      currentWinInButton.style.display = 'none'; //Скрываем div с индикатором выйгрыша
-      flyawayJetPack(targetX);  //Улетел - просто переименование стиля      
+      //currentWinInButton.style.display = 'none'; //Скрываем div с индикатором выйгрыша
+      isNumberActive = false; // Сбрасываем флаг активации раунда
+      flyawayJetPack(targetX);  //Улетел - просто переименование стиля         
     }
   }
 
-  requestAnimationFrame(updateNumber);
+  requestAnimationFrame(updateNumber); // Запускаем анимацию
 }
-
-animateNumber(1.04); // Запускаем анимацию числа
-
 
 function waitForAnimationToComplete(flag) 
 {
@@ -694,3 +1138,5 @@ function waitForAnimationToComplete(flag)
     }, 100); // Проверяем каждые 100 мс
   });
 }
+
+animateNumber(1.04); // Запускаем анимацию числа
