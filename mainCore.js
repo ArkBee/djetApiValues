@@ -479,6 +479,8 @@ function makeBet(Block)
   calculateWin(Block);
   Block.UserBetSize = 0; // Обнуляем размер ставки
   Block.buttonStatus = 'gTqZvy'; // Возвращаем кнопку в исходное состояние  
+  
+  disableAllButtons(Block.ID, false);//активаровать кнопки
  }
  else if(Block.isBetToNextRound) // Если ставка сделана на следующий раунд > Отменяем
  {
@@ -486,6 +488,8 @@ function makeBet(Block)
   Block.isBetToNextRound = false;  
   Block.UserBetSize = 0; // Обнуляем размер ставки
   Block.buttonStatus = 'gTqZvy'; // Возвращаем кнопку в исходное состояние
+  disableAllButtons(Block.ID, false);//активаровать кнопки
+  
  }
  else if(!Block.isMadeBetToThisRound && !Block.isBetToNextRound) //Если ставка не сделана и нет на следующий раунд > ставим ставку
  {
