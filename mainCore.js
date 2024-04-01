@@ -540,8 +540,8 @@ function motionJetPack(command)
   if (Xg < centerOfJetPack + 10) arrowX = true; //левый барьер
   if (Xg > centerOfJetPack + 50) arrowX = false; //правый барьер
 
-  if (Yg < 52) arrowY = true;
-  if (Yg > 58) arrowY = false;
+  if (Yg < 62) arrowY = true;
+  if (Yg > 68) arrowY = false;
 
   Xg += arrowX ? 0.15 : -0.1;
   Yg += arrowY ? 0.07 : -0.06;
@@ -591,7 +591,7 @@ async function StartJetPack(coefficientX)
   let completionPercentage = (coefficientX - 1.0) / 0.3; // 0,10
   if (completionPercentage >= 1) completionPercentage = 1;
 
-  let targetX = (centerOfJetPack + 43) * completionPercentage; // Целевая позиция X в зависимости от процента выполнения
+  let targetX = (centerOfJetPack + 43) * completionPercentage; // Целевая позиция X в зависимости от процента выполнения (centerOfJetPack + 43) * completionPercentage;
   setElementOpacity(JetPak, '1');
   setElementOpacity(AllJettPak, '1');
   setElementOpacity(Waiting, '0');
@@ -604,7 +604,7 @@ async function StartJetPack(coefficientX)
 
       if (completionPercentage < 0.5)
         Yg -= 0.1; // Скорость движения
-      else Yg -= 0.5; // Скорость движения
+      else Yg -= 0.85; // Скорость движения 0.5
       JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
 
       // Обновляем координаты для анимаций прыжка
@@ -702,7 +702,7 @@ async function flyawayJetPack(X)
           {
             isFlyawayActive = false;
             //onsole.info('isFlyawayActive ОФАЕМ ПЕРЕМЕННУЮ');
-            curX.textContent = parseFloat(1.00).toFixed(2);
+            
             WaitingProgreesBar(); // Запускаем анимацию полосы ожидания
 
 
@@ -776,6 +776,7 @@ async function WaitingProgreesBar() //Ждём следующего раунда
   setElementOpacity(AllJettPak, '0');
   setElementOpacity(notifyWin, '0');
   setElementOpacity(waitNextRound, '1');
+  curX.textContent = parseFloat(1.00).toFixed(2); // Устанавливаем начальное значение X
 
   for (let end = 100; end > 0; end--)
   {
@@ -835,8 +836,9 @@ async function WaitingProgreesBar() //Ждём следующего раунда
             disableAllButtons(element.ID, true); // Делаем кнопки доступными
           });
           console.log("x: " + x);
-          animateNumber(x); //Начать новый раунд   
-        }    
+          
+        } 
+        animateNumber(x); //Начать новый раунд      
   }, 2000);
   return;
 }
