@@ -468,7 +468,7 @@ function updateBalance(operation, betBlock) {
 function makeBet(Block)
 {
   if (DEV_MODE) console.info('*************makeBet*****************');
-  if (DEV_MODE) console.info('*************VERSION 0.3 - 55-65*****************');
+  if (DEV_MODE) console.info('*************VERSION 0.4 - new X - speed*****************');
 //disableAllButtons(Block.ID, true); // Делаем кнопки недоступными
 /**
  * Проверка на возможность сделать ставку
@@ -1111,6 +1111,7 @@ function animateNumber(targetX)
       // Адаптируем шаг изменения числа
       if (currentNumber < 1.10) step = 0.005;
       else if (currentNumber < 2.0)step = 0.009;
+      else if (currentNumber < 5.0)step = 0.02;
       else
       {
         updateInterval = updateInterval - 0.01; // Уменьшаем интервал обновления для ускорения анимации
