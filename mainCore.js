@@ -468,7 +468,7 @@ function updateBalance(operation, betBlock) {
 function makeBet(Block)
 {
   if (DEV_MODE) console.info('*************makeBet*****************');
-  if (DEV_MODE) console.info('*************VERSION 0.1*****************');
+  if (DEV_MODE) console.info('*************VERSION 0.2 - 50-60*****************');
 //disableAllButtons(Block.ID, true); // Делаем кнопки недоступными
 /**
  * Проверка на возможность сделать ставку
@@ -541,8 +541,8 @@ function motionJetPack(command)
   if (Xg < centerOfJetPack + 10) arrowX = true; //левый барьер
   if (Xg > centerOfJetPack + 50) arrowX = false; //правый барьер
 
-  if (Yg < -40) arrowY = true;
-  if (Yg > -30) arrowY = false;
+  if (Yg < -60) arrowY = true;
+  if (Yg > -50) arrowY = false;
 
   Xg += arrowX ? 0.15 : -0.1;
   Yg += arrowY ? 0.07 : -0.06;
