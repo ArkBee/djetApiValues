@@ -540,8 +540,8 @@ function motionJetPack(command)
   if (Xg < centerOfJetPack + 10) arrowX = true; //левый барьер
   if (Xg > centerOfJetPack + 50) arrowX = false; //правый барьер
 
-  if (Yg < 62) arrowY = true;
-  if (Yg > 68) arrowY = false;
+  if (Yg < -40) arrowY = true;
+  if (Yg > -30) arrowY = false;
 
   Xg += arrowX ? 0.15 : -0.1;
   Yg += arrowY ? 0.07 : -0.06;
