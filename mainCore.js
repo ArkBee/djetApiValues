@@ -219,7 +219,7 @@ function makeNotifyWinVisible(visible, time = 400,nubmerOfCounter = 1)
       const opacity = Math.min(progress, 1); // Устанавливаем прозрачность от 0 до 1
       const translateY = Math.min(100 * progress, 100); // Перемещаем от 0 до 100px по Y
       notifyWin.style.opacity = opacity;
-      notifyWin.style.transform = `translateY(${ translateY+30 }px)`;
+      notifyWin.style.transform = `translateY(${ translateY+10 }px)`;
       if (progress < 1)
       {
         // Продолжаем анимацию, если прогресс меньше 1
@@ -230,7 +230,7 @@ function makeNotifyWinVisible(visible, time = 400,nubmerOfCounter = 1)
       const opacity = Math.max(1 - progress, 0); // Устанавливаем прозрачность от 1 до 0
       const translateY = Math.max(100 - 100 * progress, 0); // Перемещаем от 100 до 0px по Y
       notifyWin.style.opacity = opacity;
-      notifyWin.style.transform = `translateY(${ translateY+30 }px)`;
+      notifyWin.style.transform = `translateY(${ translateY+10 }px)`;
       if (progress < 1)
       {        // Продолжаем анимацию, если прогресс меньше 1
         requestAnimationFrame(animate);
@@ -468,7 +468,7 @@ function updateBalance(operation, betBlock) {
 function makeBet(Block)
 {
   if (DEV_MODE) console.info('*************makeBet*****************');
-  if (DEV_MODE) console.info('*************VERSION 0.2 - 50-60*****************');
+  if (DEV_MODE) console.info('*************VERSION 0.3 - 55-65*****************');
 //disableAllButtons(Block.ID, true); // Делаем кнопки недоступными
 /**
  * Проверка на возможность сделать ставку
@@ -538,11 +538,11 @@ function motionJetPack(command)
   AllJettPak.style.opacity = '1';
   JetPak.style.opacity = "1";
 
-  if (Xg < centerOfJetPack + 10) arrowX = true; //левый барьер
-  if (Xg > centerOfJetPack + 50) arrowX = false; //правый барьер
+  if (Xg < centerOfJetPack + 50) arrowX = true; //левый барьер
+  if (Xg > centerOfJetPack + 110) arrowX = false; //правый барьер
 
-  if (Yg < -60) arrowY = true;
-  if (Yg > -50) arrowY = false;
+  if (Yg < -65) arrowY = true;
+  if (Yg > -55) arrowY = false;
 
   Xg += arrowX ? 0.15 : -0.1;
   Yg += arrowY ? 0.07 : -0.06;
