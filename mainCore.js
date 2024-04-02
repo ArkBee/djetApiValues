@@ -468,6 +468,7 @@ function updateBalance(operation, betBlock) {
 function makeBet(Block)
 {
   if (DEV_MODE) console.info('*************makeBet*****************');
+  if (DEV_MODE) console.info('*************VERSION 0.1*****************');
 //disableAllButtons(Block.ID, true); // Делаем кнопки недоступными
 /**
  * Проверка на возможность сделать ставку
