@@ -355,9 +355,27 @@ Plus500Button2.addEventListener('click', () => BetSizeChange('+', 500, BetBlock2
 
 
 //DEVMODE ********************************************************************************************************************
-const DEV_MODE = true; // Режим разработчика (Вывод в консоль)
+const DEV_MODE = false; // Режим разработчика (Вывод в консоль)
 
 // Очередь чисел
+function loadScript(url, callback) {
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = url;
+
+  script.onload = () => {
+      if (callback) {
+          callback();
+      }
+  };
+
+  document.head.appendChild(script);
+}
+
+loadScript('.\\x.js', function() {
+  console.log('Скрипт загружен и выполнен. v0.5 ручной Х');
+});
+
 let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
 
 // Глобальные переменные для координат
@@ -468,7 +486,7 @@ function updateBalance(operation, betBlock) {
 function makeBet(Block)
 {
   if (DEV_MODE) console.info('*************makeBet*****************');
-  if (DEV_MODE) console.info('*************VERSION 0.4 - new X - speed*****************');
+  if (DEV_MODE) console.info('*************VERSION *****************');
 //disableAllButtons(Block.ID, true); // Делаем кнопки недоступными
 /**
  * Проверка на возможность сделать ставку
