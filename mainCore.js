@@ -373,7 +373,7 @@ function loadScript(url, callback) {
 }
 
 loadScript('.\\x.js', function() {
-  console.log('Скрипт загружен и выполнен. v0.5 ручной Х');
+  console.log('Скрипт загружен и выполнен. v0.6 ручной Х и ускорен');
 });
 
 let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
@@ -1130,10 +1130,13 @@ function animateNumber(targetX)
       if (currentNumber < 1.10) step = 0.005;
       else if (currentNumber < 2.0)step = 0.009;
       else if (currentNumber < 5.0)step = 0.02;
+      else if(currentNumber < 10.0) step = 0.05;
+      else if(currentNumber < 50.0) step = 0.09;
+      else if(currentNumber < 100.0) step = 0.1;
       else
       {
         updateInterval = updateInterval - 0.01; // Уменьшаем интервал обновления для ускорения анимации
-        step += 0.0001;
+        step += 0.001;
       }
     }
 
