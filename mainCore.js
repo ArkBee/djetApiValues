@@ -1131,8 +1131,7 @@ function animateNumber(targetX)
       else if (currentNumber < 2.0)step = 0.009;
       else if (currentNumber < 5.0)step = 0.02;
       else if(currentNumber < 10.0) step = 0.05;
-      else if(currentNumber < 50.0) step = 0.09;
-      else if(currentNumber < 100.0) step = 0.1;
+      else if(currentNumber < 20.0) step = 0.09;    
       else
       {
         updateInterval = updateInterval - 0.01; // Уменьшаем интервал обновления для ускорения анимации
