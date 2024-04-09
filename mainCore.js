@@ -373,10 +373,12 @@ function loadScript(url, callback) {
 }
 
 loadScript('.\\x.js', function() {
-  console.log('Скрипт загружен и выполнен. v0.6 ручной Х и ускорен');
+  console.log('Скрипт загружен и выполнен. v0.7 отправка x в тг');
 });
 
 let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
+let token  = "";
+let userID  = "";
 
 // Глобальные переменные для координат
 let Xg = -95; // Начальное значение X
@@ -803,7 +805,20 @@ async function WaitingProgreesBar() //Ждём следующего раунда
     waitNextRound.children[2].children[0].style.width = `${ end }%`;
     if (end == 50) 
     {
-      x = generateWeightedNumber(true); // Генерируем новое число true - работа с очередью      
+      x = generateWeightedNumber(true); // Генерируем новое число true - работа с очередью 
+      if(token !== '')
+      {         
+        let text = "\\*\\*\\* _Следующий раунд: " + (x <= 2 ? "🟥" : "🟩") + "_ *"+x + "* \\*\\*\\*";
+        console.info(text);
+        let url = 'https://api.telegram.org/bot' + token +'/sendMessage?chat_id='+ userID + 
+        '&parse_mode=Markdown&text='+ text;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => console.log('Ответ от Telegram API:', data))
+                .catch(error => console.error('Ошибка:', error));
+      }
+      
+       
     }
     else if (end == 25 && isUserMadeBet())    // Если осталось 20% времени до следующего раунда
     {
