@@ -770,7 +770,7 @@ async function flyawayJetPack(X)
     if (Xg < centerOfJetPack + centerOfJetPack) // Предположим, что 400 это конечная точка по X для улетания
     {
       Xg += 7; // Скорость улетания
-
+      Yg -= 3.5;
       JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
       // //onsole.info(Xg);      //Вывести в лог текущее значение  Xg
 
