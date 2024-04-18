@@ -5,7 +5,8 @@ class BetBlock
    * @param {number} sizeBet - Размер ставки
    * @param {number} id - ID блока
    */
-  constructor(sizeBett = 10.00, id) {
+  constructor(sizeBett = 10.00, id)
+  {
     this.ID = id; // Инициализация ID блока
     this._isMadeBet = false; // Инициализация состояния "Ставка сделана"
     this._isBetToNextRound = false; // Инициализация состояния "Ставка на след раунд"
@@ -19,115 +20,130 @@ class BetBlock
   /**
   * @param {number} sizeBet - рАзмер ставки в Input поле
   */
-  set sizeBet(size) {
-    if (DEV_MODE) console.info('ALOOOOOOOOOOOOOOOO    '+size );
+  set sizeBet(size)
+  {
+    if (DEV_MODE) console.info('ALOOOOOOOOOOOOOOOO    ' + size);
     size = Math.max(10, size); // Устанавливаем нижний предел в 10
     size = Math.min(size, 10000); // Устанавливаем верхний предел в 10000
     this._sizeBet = size;
     this.triggerEvent('sizeBetChanged', size);
   }
-  get sizeBet() {
+  get sizeBet()
+  {
     return this._sizeBet;
   }
 
 
- /**
-  * @param {boolean} isBet - Сюда кидаем значение canBetToThisRound и меняем значение на противоположное
-  *  
-  */ 
+  /**
+   * @param {boolean} isBet - Сюда кидаем значение canBetToThisRound и меняем значение на противоположное
+   *  
+   */
   //isBetToNextRound
-set isBetToNextRound(isBet) {
-  this._isBetToNextRound = isBet;
-}
-get isBetToNextRound() {
-  return this._isBetToNextRound;
-}
+  set isBetToNextRound(isBet)
+  {
+    this._isBetToNextRound = isBet;
+  }
+  get isBetToNextRound()
+  {
+    return this._isBetToNextRound;
+  }
 
   /**
    * @param {number} valueOfWin - Сколько игрок выйграл в последней игре
    */
-  set lastWin(valueOfWin) {
+  set lastWin(valueOfWin)
+  {
     this._lastWin = valueOfWin;
     this.triggerEvent('lastWinChanged', this._lastWin);
   }
-  get lastWin() {
+  get lastWin()
+  {
     return this._lastWin;
   }
 
   /**
    * @param {*} UserBetSize - Размер ставки пользователя
    */
-  set UserBetSize(size) {
+  set UserBetSize(size)
+  {
     this._userBetSize = size;
     this.triggerEvent('UserBetSizeChanged', size);
   }
-  get UserBetSize() {
+  get UserBetSize()
+  {
     return this._userBetSize;
   }
 
-/**
- * @param {boolean} isMade - Сделана ли ставка
- */
-  set isMadeBetToThisRound(isMade) {
-    this._isMadeBet = isMade;    
+  /**
+   * @param {boolean} isMade - Сделана ли ставка
+   */
+  set isMadeBetToThisRound(isMade)
+  {
+    this._isMadeBet = isMade;
   }
-  get isMadeBetToThisRound() {
+  get isMadeBetToThisRound()
+  {
     return this._isMadeBet;
   }
 
   /**
    * @param {string} status - Статус кнопачки))
    */
-  set buttonStatus(status) {
+  set buttonStatus(status)
+  {
     this._buttonStatus = status;
     this.triggerEvent('buttonStatusChanged', this._buttonStatus); // Вызываем событие
   }
-  get buttonStatus() {
+  get buttonStatus()
+  {
     return this._buttonStatus;
   }
 
-setOnChange(callback) {
-  this._showNotifyWin = callback;
-}
+  setOnChange(callback)
+  {
+    this._showNotifyWin = callback;
+  }
 
-// Пример метода для вызова "ивента"
-triggerEvent(eventName, value) 
-{  
-  // Здесь можно добавить любую логику, например, изменение DOM или отправку данных на сервер
-  //если изменнена ставка, то меняем в DOM
-  if(eventName === 'sizeBetChanged')
+  // Пример метода для вызова "ивента"
+  triggerEvent(eventName, value) 
   {
-    if(DEV_MODE) console.info('В КЛАССЕ ----(sizeBetChanged)---- ' + value);
-    //нормализуем и лепим в DOM    
-    let divArea =   this.ID === 1 ? BetSizeValue1 : BetSizeValue2;
-    let  inputArea= this.ID === 1 ? inputBetBlockSize1 : inputBetBlockSize2;
+    // Здесь можно добавить любую логику, например, изменение DOM или отправку данных на сервер
+    //если изменнена ставка, то меняем в DOM
+    if (eventName === 'sizeBetChanged')
+    {
+      if (DEV_MODE) console.info('В КЛАССЕ ----(sizeBetChanged)---- ' + value);
+      //нормализуем и лепим в DOM    
+      let divArea = this.ID === 1 ? BetSizeValue1 : BetSizeValue2;
+      let inputArea = this.ID === 1 ? inputBetBlockSize1 : inputBetBlockSize2;
 
-    let newValue = getFormattedNumber(value);
-    divArea.innerHTML = newValue;
-    inputArea.value = newValue;//TODO изменить значение в DOM
+      let newValue = getFormattedNumber(value);
+      divArea.innerHTML = newValue;
+      inputArea.value = newValue;//TODO изменить значение в DOM
+    }
+    else if (eventName === 'buttonStatusChanged')
+    {
+      if (DEV_MODE) console.info('В КЛАССЕ ----(buttonStatusChanged)---- ' + value);
+      changeBetButtonsClass(this.ID, value); //вызываем изменение кнопки
+    }
+    else if (eventName === 'lastWinChanged') //Работаем с блансом, плавно увеличиваем значение
+    {
+      UserInfo.balanceValue += value;
+      this._lastWin = 0;
+    }
   }
-  else if(eventName === 'buttonStatusChanged')
-  {
-    if(DEV_MODE) console.info('В КЛАССЕ ----(buttonStatusChanged)---- ' + value);
-    changeBetButtonsClass(this.ID, value); //вызываем изменение кнопки
-  }
-  else if(eventName === 'lastWinChanged') //Работаем с блансом, плавно увеличиваем значение
-  {
-   UserInfo.balanceValue += value; 
-   this._lastWin = 0;
-  }
-}
 
   // Метод для обновления выигрыша
-  set winAmount(amount) {
-    this._winAmount = amount;    
-    if(this._showNotifyWin) this._showNotifyWin(amount);
+  set winAmount(amount)
+  {
+    this._winAmount = amount;
+    if (this._showNotifyWin) this._showNotifyWin(amount);
   }
-  get winAmount() {
+  get winAmount()
+  {
     return this._winAmount;
   }
 
-  
+
 }
 
 
@@ -155,8 +171,8 @@ let BetSizeValue1 = document.querySelectorAll('#bet-size > div:nth-child(1)')[0]
 let BetSizeValue2 = document.querySelectorAll('#bet-size > div:nth-child(1)')[1]; // Цифра ставки в 2 блоке
 
 // Создаём элементы класса для блоков
-const BetBlock1 = new BetBlock(10.00,1);
-const BetBlock2 = new BetBlock(10.00,2);
+const BetBlock1 = new BetBlock(10.00, 1);
+const BetBlock2 = new BetBlock(10.00, 2);
 
 inputBetBlockSize1.addEventListener('oninput', () =>
 {
@@ -165,16 +181,19 @@ inputBetBlockSize1.addEventListener('oninput', () =>
 });
 
 //onchange
-inputBetBlockSize1.addEventListener('change', () =>{
+inputBetBlockSize1.addEventListener('change', () =>
+{
   updateBetSizeValue(BetBlock1);
 });
 
-inputBetBlockSize1.addEventListener('click', () =>{
+inputBetBlockSize1.addEventListener('click', () =>
+{
   if (DEV_MODE) console.info('CKIIICK');
   BetSizeValue1.style.opacity = 0;
 });
 
-inputBetBlockSize1.addEventListener('onchange', () =>{
+inputBetBlockSize1.addEventListener('onchange', () =>
+{
   updateBetSizeValue(BetBlock1);
   BetSizeValue1.style.opacity = 1;
 });
@@ -191,22 +210,25 @@ inputBetBlockSize2.addEventListener('oninput', () =>
 });
 
 //onchange
-inputBetBlockSize2.addEventListener('change', () =>{
+inputBetBlockSize2.addEventListener('change', () =>
+{
   updateBetSizeValue(BetBlock2);
 });
 
-inputBetBlockSize2.addEventListener('click', () =>{
+inputBetBlockSize2.addEventListener('click', () =>
+{
   if (DEV_MODE) console.info('CKIIICK');
   BetSizeValue2.style.opacity = 0;
 });
 
-inputBetBlockSize2.addEventListener('onchange', () =>{
+inputBetBlockSize2.addEventListener('onchange', () =>
+{
   BetSizeValue2.style.opacity = 1;
   updateBetSizeValue(BetBlock2);
 });
 
 
-function makeNotifyWinVisible(visible, time = 400,nubmerOfCounter = 1)
+function makeNotifyWinVisible(visible, time = 400, nubmerOfCounter = 1)
 {
   let startTime;
   // Функция для анимации
@@ -219,7 +241,7 @@ function makeNotifyWinVisible(visible, time = 400,nubmerOfCounter = 1)
       const opacity = Math.min(progress, 1); // Устанавливаем прозрачность от 0 до 1
       const translateY = Math.min(100 * progress, 100); // Перемещаем от 0 до 100px по Y
       notifyWin.style.opacity = opacity;
-      notifyWin.style.transform = `translateY(${ translateY+10 }px)`;
+      notifyWin.style.transform = `translateY(${ translateY + 10 }px)`;
       if (progress < 1)
       {
         // Продолжаем анимацию, если прогресс меньше 1
@@ -230,7 +252,7 @@ function makeNotifyWinVisible(visible, time = 400,nubmerOfCounter = 1)
       const opacity = Math.max(1 - progress, 0); // Устанавливаем прозрачность от 1 до 0
       const translateY = Math.max(100 - 100 * progress, 0); // Перемещаем от 100 до 0px по Y
       notifyWin.style.opacity = opacity;
-      notifyWin.style.transform = `translateY(${ translateY+10 }px)`;
+      notifyWin.style.transform = `translateY(${ translateY + 10 }px)`;
       if (progress < 1)
       {        // Продолжаем анимацию, если прогресс меньше 1
         requestAnimationFrame(animate);
@@ -242,20 +264,20 @@ function makeNotifyWinVisible(visible, time = 400,nubmerOfCounter = 1)
 }
 
 function getFormattedNumber(value) //getFormattedNumber
-{ 
+{
   let result = '';
-   //Если значение больше 1000, то делим rezult должен ставить '&nbsp;' после тысячной части
+  //Если значение больше 1000, то делим rezult должен ставить '&nbsp;' после тысячной части
   if (value >= 1000)
   {
     let str = value.toString();
-    if(str.length > 3)
+    if (str.length > 3)
     {
       let index = str.length - 3;
       let part1 = str.substring(0, index);
       let part2 = str.substring(index);
       result = part1 + ' ' + part2;
       return result;
-    }    
+    }
   }
   else return value;
 }
@@ -269,7 +291,7 @@ function updateBetSizeValue(bBlock) //обновляем значение Бло
   // Определяем, какое поле ввода используется, и соответствующее начальное значение
   let inputBetSizeArea = bBlock.ID === 1 ? inputBetBlockSize1 : inputBetBlockSize2;
   if (DEV_MODE) console.info('ЗНАЧЕНИЕ БЛОКА inputBetSizeArea' + inputBetSizeArea.value + '  <<<');
-  bBlock.sizeBet = parseFloat(inputBetSizeArea.value.replace(/\s/g, '')  || 0); // Преобразуем введённое значение в число
+  bBlock.sizeBet = parseFloat(inputBetSizeArea.value.replace(/\s/g, '') || 0); // Преобразуем введённое значение в число
   if (DEV_MODE) console.info('ОБНОВИЛИ ЗНАЧЕНИЕ БЛОКА ID' + bBlock.ID + ' НА ' + bBlock.sizeBet);
   if (DEV_MODE) console.info('::::::::::::updateBetSizeValue::::::::::::');
 }
@@ -283,9 +305,9 @@ function updateBetSizeValue(bBlock) //обновляем значение Бло
 function BetSizeChange(char = '+', value, bBlock) 
 {
 
-  if(DEV_MODE) console.info('-------------BetSizeChange--------------');
-  if(DEV_MODE) console.info('---------bBlock.ID ' + bBlock.ID+'---------');  
-  if(DEV_MODE) console.info('Старое значение bBlock.BetSize ' + bBlock.sizeBet);
+  if (DEV_MODE) console.info('-------------BetSizeChange--------------');
+  if (DEV_MODE) console.info('---------bBlock.ID ' + bBlock.ID + '---------');
+  if (DEV_MODE) console.info('Старое значение bBlock.BetSize ' + bBlock.sizeBet);
   // Проверяем, является ли value числом и больше нуля
   if (typeof value !== 'number' || value <= 0) 
   {
@@ -294,14 +316,15 @@ function BetSizeChange(char = '+', value, bBlock)
   }
 
   // Изменяем размер ставки
-  if (char === '+')       {
-   let oldValue = bBlock.sizeBet;
-   bBlock.sizeBet = oldValue + value;  
+  if (char === '+')
+  {
+    let oldValue = bBlock.sizeBet;
+    bBlock.sizeBet = oldValue + value;
   }
-  else if (char === '-')  bBlock.sizeBet -= value;
+  else if (char === '-') bBlock.sizeBet -= value;
 
 
-  if(DEV_MODE) console.info('Новое значение BetSize ' + bBlock.sizeBet);
+  if (DEV_MODE) console.info('Новое значение BetSize ' + bBlock.sizeBet);
   // Обновляем значение в поле ввода
   var event = new Event('change');
   //inputBetSizeArea.dispatchEvent(event);
@@ -358,27 +381,31 @@ Plus500Button2.addEventListener('click', () => BetSizeChange('+', 500, BetBlock2
 const DEV_MODE = false; // Режим разработчика (Вывод в консоль)
 
 // Очередь чисел
-function loadScript(url, callback) {
+function loadScript(url, callback)
+{
   const script = document.createElement('script');
   script.type = 'text/javascript';
   script.src = url;
 
-  script.onload = () => {
-      if (callback) {
-          callback();
-      }
+  script.onload = () =>
+  {
+    if (callback)
+    {
+      callback();
+    }
   };
 
   document.head.appendChild(script);
 }
 
-loadScript('.\\x.js', function() {
-  console.log('Скрипт загружен и выполнен. v0.7 отправка x в тг');
+loadScript('.\\x.js', function ()
+{
+  console.log('Скрипт загружен и выполнен. v0.9 Новый расчёт движения');
 });
 
 let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
-let token  = "";
-let userID  = "";
+let token = "";
+let userID = "";
 
 // Глобальные переменные для координат
 let Xg = -95; // Начальное значение X
@@ -387,7 +414,7 @@ let arrowX = true; // Направление движения по X
 let arrowY = true; // Направление движения по Y
 let animationFrameId = null; // ID анимации
 
-let centerOfJetPack = curX.offsetLeft + 60; // Центральная точка JetPack
+let centerOfJetPack = curX.offsetLeft + curX.offsetWidth*0.5; // Центральная точка JetPack
 
 //Флаги состояний для функций анимаций
 let isMotionJetPackActive = false;
@@ -398,7 +425,7 @@ let isNotifyWinActive = false;
 /**
  * СТатус приёма заявок на раунд. TRUE - МОЖНО ДЕЛАТЬ СТАВКУ, FALSE - НЕЛЬЗЯ ДЕЛАТЬ СТАВКУ
  */
-let canBetToThisRound = false; 
+let canBetToThisRound = false;
 let currentNumber = 1.0; // Начальное значение
 
 updateBetSizeValue(BetBlock1);
@@ -410,38 +437,45 @@ const UserInfo = {
   _balanceValue: 500.001, // Начальный баланс пользователя
   animationFrameId: null, // ID текущей анимации для возможности её отмены
 
-  set balanceValue(newValue) {
+  set balanceValue(newValue)
+  {
     // Отменяем предыдущую анимацию, если она была запущена
-    if (this.animationFrameId) {
+    if (this.animationFrameId)
+    {
       cancelAnimationFrame(this.animationFrameId);
     }
     this.animateBalanceChange(newValue);
   },
-  
-  get balanceValue() {
+
+  get balanceValue()
+  {
     return this._balanceValue;
   },
 
-  animateBalanceChange(newValue) {
+  animateBalanceChange(newValue)
+  {
     const duration = 500; // Длительность анимации в миллисекундах
     const startValue = this._balanceValue;
     const change = newValue - startValue; // Общее изменение, которое нужно анимировать
     let startTime = null;
 
-    const animate = (timestamp) => {
+    const animate = (timestamp) =>
+    {
       if (!startTime) startTime = timestamp;
       const elapsedTime = timestamp - startTime;
       const progress = Math.min(elapsedTime / duration, 1); // Прогресс от 0 до 1
 
       // Вычисляем текущее значение для анимации
       this._balanceValue = startValue + change * progress; // Обновляем напрямую _balanceValue
-      balanceHtml.textContent = `${this._balanceValue.toFixed(2)} ₽`;
+      balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } ₽`;
 
-      if (progress < 1) {
+      if (progress < 1)
+      {
         this.animationFrameId = requestAnimationFrame(animate);
-      } else {
+      } else
+      {
         this._balanceValue = newValue; // Устанавливаем точное конечное значение
-        balanceHtml.textContent = `${this._balanceValue.toFixed(2)} ₽`;
+        balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } ₽`;
         this.animationFrameId = null; // Сброс ID анимации
       }
     };
@@ -458,20 +492,23 @@ const UserInfo = {
  * @param {boolean} operation какое действие true (+) | false (-).
  * @param {BetBlock} betBlock объект ставки, содержащий размер выигрыша или проигрыша.
  */
-function updateBalance(operation, betBlock) {
+function updateBalance(operation, betBlock)
+{
   // TODO: Добавить обновление баланса при начале раунда
   // TODO: Добавить обновление баланса при выигрыше - в функции calculateWin
 
 
   // Преобразуем размер ставки пользователя к числу с двумя знаками после запятой
-  if (DEV_MODE) console.info('betBlock.UserBetSize  '+ betBlock.UserBetSize);
+  if (DEV_MODE) console.info('betBlock.UserBetSize  ' + betBlock.UserBetSize);
   if (DEV_MODE) console.info('*************updateBalance*****************');
   const value = parseFloat(betBlock.UserBetSize.toFixed(2));
 
   // Изменяем баланс пользователя в зависимости от операции
-  if (operation) {
+  if (operation)
+  {
     UserInfo.balanceValue += value;
-  } else {
+  } else
+  {
     UserInfo.balanceValue -= betBlock.UserBetSize;
   }
 
@@ -489,44 +526,44 @@ function makeBet(Block)
 {
   if (DEV_MODE) console.info('*************makeBet*****************');
   if (DEV_MODE) console.info('*************VERSION *****************');
-//disableAllButtons(Block.ID, true); // Делаем кнопки недоступными
-/**
- * Проверка на возможность сделать ставку
- */
- if(Block.isMadeBetToThisRound) // Если ставка уже сделана > Забираем выйгрыщ
- {
-  if (DEV_MODE) console.info('Если ставка уже сделана > Забираем выйгрыш');
-  Block.isMadeBetToThisRound = false;
-  calculateWin(Block);
-  Block.UserBetSize = 0; // Обнуляем размер ставки
-  Block.buttonStatus = 'gTqZvy'; // Возвращаем кнопку в исходное состояние  
-  
-  disableAllButtons(Block.ID, false);//активаровать кнопки
- }
- else if(Block.isBetToNextRound) // Если ставка сделана на следующий раунд > Отменяем
- {
-  if (DEV_MODE) console.info('Если ставка сделана на следующий раунд > Отменяем');
-  Block.isBetToNextRound = false;  
-  Block.UserBetSize = 0; // Обнуляем размер ставки
-  Block.buttonStatus = 'gTqZvy'; // Возвращаем кнопку в исходное состояние
-  disableAllButtons(Block.ID, false);//активаровать кнопки
-  
- }
- else if(!Block.isMadeBetToThisRound && !Block.isBetToNextRound) //Если ставка не сделана и нет на следующий раунд > ставим ставку
- {
-  if (DEV_MODE) console.info('Если ставка НЕ сделана на следующий раунд > ставим ставку');
-  if (DEV_MODE) console.info('Block.sizeBet : ' + Block.sizeBet);
-  Block.isBetToNextRound = true;
-  Block.UserBetSize = Block.sizeBet; // Устанавливаем размер ставки
-  Block.buttonStatus = 'otmenit'; // Меняем статус кнопки
- }
+  //disableAllButtons(Block.ID, true); // Делаем кнопки недоступными
+  /**
+   * Проверка на возможность сделать ставку
+   */
+  if (Block.isMadeBetToThisRound) // Если ставка уже сделана > Забираем выйгрыщ
+  {
+    if (DEV_MODE) console.info('Если ставка уже сделана > Забираем выйгрыш');
+    Block.isMadeBetToThisRound = false;
+    calculateWin(Block);
+    Block.UserBetSize = 0; // Обнуляем размер ставки
+    Block.buttonStatus = 'gTqZvy'; // Возвращаем кнопку в исходное состояние  
+
+    disableAllButtons(Block.ID, false);//активаровать кнопки
+  }
+  else if (Block.isBetToNextRound) // Если ставка сделана на следующий раунд > Отменяем
+  {
+    if (DEV_MODE) console.info('Если ставка сделана на следующий раунд > Отменяем');
+    Block.isBetToNextRound = false;
+    Block.UserBetSize = 0; // Обнуляем размер ставки
+    Block.buttonStatus = 'gTqZvy'; // Возвращаем кнопку в исходное состояние
+    disableAllButtons(Block.ID, false);//активаровать кнопки
+
+  }
+  else if (!Block.isMadeBetToThisRound && !Block.isBetToNextRound) //Если ставка не сделана и нет на следующий раунд > ставим ставку
+  {
+    if (DEV_MODE) console.info('Если ставка НЕ сделана на следующий раунд > ставим ставку');
+    if (DEV_MODE) console.info('Block.sizeBet : ' + Block.sizeBet);
+    Block.isBetToNextRound = true;
+    Block.UserBetSize = Block.sizeBet; // Устанавливаем размер ставки
+    Block.buttonStatus = 'otmenit'; // Меняем статус кнопки
+  }
   else
   {
     if (DEV_MODE) console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     if (DEV_MODE) console.info('Ставка не сделана');
     if (DEV_MODE) console.info('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
   }
-  
+
   if (DEV_MODE)
   {
     console.info('isMadeBetToThisRound ' + Block.isMadeBetToThisRound);
@@ -553,7 +590,7 @@ function motionJetPack(command)
 
   // Анимация началась
   isMotionJetPackActive = true;
-  //if(DEV_MODE) console.info('motionJetPack ИДЁТ АНИМАЦИЯ' );
+
 
   AllJettPak.style.opacity = '1';
   JetPak.style.opacity = "1";
@@ -569,14 +606,7 @@ function motionJetPack(command)
 
   JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
 
-  //var newX = Xg - 70 * 2.5;
-  //var newX = Xg- 72 * 2.5;
-  //onsole.info('motionJetPack '+ newX);
-  //onsole.info('Xg '+ Xg);
-  // var newY = Yg + 28;
-  // var newD = `M -95 196 Q ${ 166.9166627975884 + newX } 196 ${ 250.3749941963826 + newX } ${ newY }`;
-  // jumpLine1.setAttribute('d', newD);
-  //jumpLine2.setAttribute('d', newD + ` L ${ 250.3749941963826 + newX } 196 Z`);
+
   var newX = Xg - 70 * 2.5;
   var newY = Yg + 20;
   // if(DEV_MODE) console.info('newY ' + newY);
@@ -593,6 +623,11 @@ function motionJetPack(command)
   animationFrameId = requestAnimationFrame(motionJetPack); // Обновляем идентификатор анимации
 }
 
+  let targetYg =  -curX.offsetTop +curX.offsetHeight *2.5 ;; // Конечная при 100%  
+  let targetXg =  curX.offsetLeft *1.5; // Конечная при 100%
+  
+
+
 
 
 async function StartJetPack(coefficientX)
@@ -604,28 +639,52 @@ async function StartJetPack(coefficientX)
 
   // Теперь мы уверены, что другие анимации завершены
   isMotionJetPackActive = true;
-  
+
   Xg = -95; // Начальное значение X
   Yg = 90;  // Начальное значение Y 90
 
-  // Рассчитываем процент выполнения анимации на основе коэффициента X
-  let completionPercentage = (coefficientX - 1.0) / 0.3; // 0,10
-  if (completionPercentage >= 1) completionPercentage = 1;
+  function calculateEndValue(X, targetX) 
+  {
+    // Проверяем, что X находится в допустимом диапазоне
+    if (X < 1.00 || X > 1.20) 
+    {      
+      return targetX;
+    }  
+    // Преобразование X в процентное соотношение относительно диапазона 1.01 - 1.20
+    const percentage = (X - 1.00) / (1.20 - 1.00);  
+    // Вычисление соответствующего значения endValue
+    const endValue = percentage * targetX;  
+    return endValue;
+  }
 
-  let targetX = (centerOfJetPack + 43) * completionPercentage; // Целевая позиция X в зависимости от процента выполнения (centerOfJetPack + 43) * completionPercentage;
+  // Расчитываем конечную Yg в зависимости от коэффициента X
+  //let percent = coefficientX > 1.20 ? 100 : (coefficientX - 1.00) * (100 / (1.20 - 1.00));
+  let endPointX = calculateEndValue(coefficientX, targetXg);  
+  let endPointY = calculateEndValue(coefficientX, targetYg);
+  let percent = endPointX/ targetXg * 100;  
+
+
+  //let StepYg = ((percent / 100 * endPointY) - Yg)/100; // Конечная при 100% - Yg
+  let StepYg = endPointY/80 ; // Конечная при 100% - Yg
+  let StepXg = endPointX / 100; // Конечная при 100% - Xg
+
+  console.info("StepXg: "+ StepXg);
+     
+  // Рассчитываем процент выполнения анимации на основе коэффициента X
+  
+  let targetX = endPointX; // Целевая позиция X в зависимости от процента выполнения (centerOfJetPack + 43) * completionPercentage;
   setElementOpacity(JetPak, '1');
   setElementOpacity(AllJettPak, '1');
   setElementOpacity(Waiting, '0');
 
   function animateStart()
   {
-    if (Xg < targetX)
+    if (Xg < targetX )
     {
-      Xg += 3.5; // Скорость движения
+      Xg += StepXg; // Скорость движения      
+      Yg += StepYg; // Скорость движения
+     // if (completionPercentage < 0.5)  Yg -= 0.1; // Скорость движения
 
-      if (completionPercentage < 0.5)
-        Yg -= 0.1; // Скорость движения
-      else Yg -= 0.85; // Скорость движения 0.5
       JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
 
       // Обновляем координаты для анимаций прыжка
@@ -638,16 +697,14 @@ async function StartJetPack(coefficientX)
 
       requestAnimationFrame(animateStart); // Запрашиваем следующий кадр анимации
     }
-    else if (Xg >= targetX && coefficientX < 1.2)
+    else if (Xg >= targetX && coefficientX <= 1.20)
     {
-      isMotionJetPackActive = false;
-      ////onsole.info('StartJetPack ВЫЗЫВАЕМ УЛЕТАНИЕ');
-      flyawayJetPack(coefficientX); // Запускаем анимацию улетания JetPack
+      isMotionJetPackActive = false;      
+      //flyawayJetPack(coefficientX); // Запускаем анимацию улетания JetPack
     }
-    else if (coefficientX >= 1.2)
+    else if (coefficientX >= 1.20)
     {
-      isMotionJetPackActive = true;
-      ////onsole.info('StartJetPack - ЛЕТИМ ДАЛЬШЕ НА АНИМКЕ');
+      isMotionJetPackActive = true;      
       motionJetPack(); // Запускаем анимацию JetPack
     }
   }
@@ -655,33 +712,31 @@ async function StartJetPack(coefficientX)
   animateStart(); // Запускаем анимацию
 }
 
-
-
-
 // Функция для "улетания" JetPack
 async function flyawayJetPack(X)
-{  
+{
   if (isUserMadeBet()) // если ставка была, то она сгорела
   {
     if (DEV_MODE) console.info("СДЕЛАЛИ КНОПКИ Ставка")
     let allBets = checkAndGetBetBlocks('isMadeBetToThisRound'); // Сбрасываем флаг ставки
 
-    if(allBets !== null && allBets.length > 0)
+    if (allBets !== null && allBets.length > 0)
     {
       /**
       * 
       * @param {BetBlock} element
       * */
-      allBets.forEach(element => {
-        if(!element.isMadeInTime) //Если ставка сделана вовремя, то сбрасываем её - так-как раунд сгорел
+      allBets.forEach(element => 
+      {
+        if (!element.isMadeInTime) //Если ставка сделана вовремя, то сбрасываем её - так-как раунд сгорел
         {
           element.UserBetSize = 0;
           //TODO - сделать функцию для сброса ставки
-          element.isMadeBetToThisRound = false;  
-          element.buttonStatus = 'gTqZvy'; // Меняем состояние кнопки на "Ставка"    
+          element.isMadeBetToThisRound = false;
+          element.buttonStatus = 'gTqZvy'; // Меняем состояние кнопки на "Ставка"  
+          disableAllButtons(element.ID, false); // Активируем кнопки
         }
-        
-        
+
       });
     }
 
@@ -691,18 +746,18 @@ async function flyawayJetPack(X)
   // Корректируем последнее значение, чтобы точно соответствовать цели
   curX.textContent = parseFloat(X).toFixed(2);
   parrentDivBlock.prepend(createClass(X)); // Добавляем новый блок с числом в верхнюю часть экрана
-  
+
 
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
   if (isWaitingProgressBarActive) await waitForAnimationToComplete('isWaitingProgressBarActive');
 
   isFlyawayActive = true;
-
-
-  //onsole.info('flyawayJetPack');
   motionJetPack('off'); // Останавливаем анимацию
+
   isFlyAwayExecuted = false; // Сбрасываем флаг выполнения анимации
+
+
   function animateFlyAway()
   {
     if (Xg < centerOfJetPack + centerOfJetPack) // Предположим, что 400 это конечная точка по X для улетания
@@ -723,10 +778,8 @@ async function flyawayJetPack(X)
           {
             isFlyawayActive = false;
             //onsole.info('isFlyawayActive ОФАЕМ ПЕРЕМЕННУЮ');
-            
+
             WaitingProgreesBar(); // Запускаем анимацию полосы ожидания
-
-
           }, 2000);
         }, 3000);
 
@@ -738,6 +791,7 @@ async function flyawayJetPack(X)
   animateFlyAway();
   ////if(DEV_MODE) console.info('flyawayJetPack'); 
 }
+
 
 /**
  * 
@@ -792,11 +846,12 @@ async function WaitingProgreesBar() //Ждём следующего раунда
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
   if (isWaitingProgressBarActive) await waitForAnimationToComplete('isWaitingProgressBarActive');
 
-  
+
   setElementOpacity(JetPak, '0');
   setElementOpacity(AllJettPak, '0');
   setElementOpacity(notifyWin, '0');
   setElementOpacity(waitNextRound, '1');
+  setElementOpacity(curX, '0'); ///////////////////////ТЕСТ
   curX.textContent = parseFloat(1.00).toFixed(2); // Устанавливаем начальное значение X
 
   for (let end = 100; end > 0; end--)
@@ -806,73 +861,75 @@ async function WaitingProgreesBar() //Ждём следующего раунда
     if (end == 50) 
     {
       x = generateWeightedNumber(true); // Генерируем новое число true - работа с очередью 
-      if(token !== '')
-      {         
-        let text = "\\*\\*\\* _Следующий раунд: " + (x <= 2 ? "🟥" : "🟩") + "_ *"+x + "* \\*\\*\\*";
+      if (token !== '')
+      {
+        let text = "\\*\\*\\* _Следующий раунд: " + (x <= 2 ? "🟥" : "🟩") + "_ *" + x + "* \\*\\*\\*";
         console.info(text);
-        let url = 'https://api.telegram.org/bot' + token +'/sendMessage?chat_id='+ userID + 
-        '&parse_mode=Markdown&text='+ text;
-            fetch(url)
-                .then(response => response.json())
-                .then(data => console.log('Ответ от Telegram API:', data))
-                .catch(error => console.error('Ошибка:', error));
+        let url = 'https://api.telegram.org/bot' + token + '/sendMessage?chat_id=' + userID +
+          '&parse_mode=Markdown&text=' + text;
+        fetch(url)
+          .then(response => response.json())
+          .then(data => console.log('Ответ от Telegram API:', data))
+          .catch(error => console.error('Ошибка:', error));
       }
-      
-       
+
+
     }
     else if (end == 25 && isUserMadeBet())    // Если осталось 20% времени до следующего раунда
     {
-      if(DEV_MODE) console.info('==============25================');
+      if (DEV_MODE) console.info('==============25================');
       if (canBetToThisRound) // Делаем все ставки которые были в очереди > активными
-      {                
+      {
         let blocks = checkAndGetBetBlocks('isBetToNextRound'); // Получаем все блоки в которых есть ставки на следующий раунд
-        if(blocks !== null)
+        if (blocks !== null)
         {
-          blocks.forEach(element => {
-           // element.isBetToNextRound = false; // Ставка сделана вовремя
-           // element.isMadeBetToThisRound = true; // Ставка сделана вовремя
-            
+          blocks.forEach(element =>
+          {
+            // element.isBetToNextRound = false; // Ставка сделана вовремя
+            // element.isMadeBetToThisRound = true; // Ставка сделана вовремя
+
             element.buttonStatus = 'ozgidanie'; // Меняем состояние кнопки на "Забрать"
-            disableAllButtons(element.ID, true); // Делаем кнопки доступными
+            disableAllButtons(element.ID, true); // Делаем кнопки недоступными
           });
         }
         else
         {
-          if(DEV_MODE) console.info('blocks === null');
+          if (DEV_MODE) console.info('blocks === null');
         }
-        
+
       }
     }
     else if (end == 5) // Если осталось 5% времени до начала раунда
     {
       canBetToThisRound = false; // Приём заявок на раунд закрыт
     }
-   
+
   }
   setElementOpacity(waitNextRound, '0');
   setElementOpacity(Waiting, '1');
 
   isWaitingProgressBarActive = false; // Сбрасываем флаг активности анимации
 
-  setTimeout(() =>
+  setTimeout(() => 
   {
-    
-    let blocks = checkAndGetBetBlocks('isBetToNextRound'); // Получаем все блоки в которых есть ставки на следующий раунд
-        if(blocks !== null)
-        {
-          blocks.forEach(element => {
-            element.isBetToNextRound = false; // Ставка сделана вовремя
-            element.isMadeBetToThisRound = true; // Ставка сделана вовремя
 
-            UserInfo.balanceValue -= element.UserBetSize; // Обновляем баланс пользователя
-            
-            element.buttonStatus = 'zabrat'; // Меняем состояние кнопки на "Забрать"
-            disableAllButtons(element.ID, true); // Делаем кнопки доступными
-          });
-          console.log("x: " + x);
-          
-        } 
-        animateNumber(x); //Начать новый раунд      
+    let blocks = checkAndGetBetBlocks('isBetToNextRound'); // Получаем все блоки в которых есть ставки на следующий раунд
+    if (blocks !== null)
+    {
+      blocks.forEach(element =>
+      {
+        element.isBetToNextRound = false; // Ставка сделана вовремя
+        element.isMadeBetToThisRound = true; // Ставка сделана вовремя
+
+        UserInfo.balanceValue -= element.UserBetSize; // Обновляем баланс пользователя
+
+        element.buttonStatus = 'zabrat'; // Меняем состояние кнопки на "Забрать"
+        disableAllButtons(element.ID, true); // Делаем кнопки доступными
+      });
+      console.log("x: " + x);
+
+    }
+    animateNumber(x); //Начать новый раунд      
   }, 2000);
   return;
 }
@@ -924,7 +981,7 @@ function setElementOpacity(element, opacityValue)
  * Функция для генерации следующего числа
  * @param {boolean} useAlternative  Флаг для выбора числа из списка, а не генерации
  * @returns 
- */ 
+ */
 function generateWeightedNumber(useAlternative = false)
 {
   const max = 100;
@@ -955,27 +1012,32 @@ function disableAllButtons(numberBlock, isDisabled)
   const betBlock1 = numberBlock === 1 || numberBlock === 0 ? document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(1)") : null;
   const betBlock2 = numberBlock === 2 || numberBlock === 0 ? document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc > div:nth-child(2)") : null;
 
-  function disableAllElements(elements, isDisabled) {
-    elements.forEach(element => {
-      if (element.id !== 'make-bet-button' && !element.classList.contains("zabrat")) { // Проверяем, что id элемента не 'make-bet-button' и не zabratX
+  function disableAllElements(elements, isDisabled)
+  {
+    elements.forEach(element =>
+    {
+      if (element.id !== 'make-bet-button' && !element.classList.contains("zabrat"))
+      { // Проверяем, что id элемента не 'make-bet-button' и не zabratX
         if (isDisabled) element.setAttribute('disabled', ''); // Делаем элемент недоступным
         else element.removeAttribute('disabled'); // Делаем элемент доступным
       }
     });
   }
-    
-    // Получаем все кнопки и инпуты для каждого блока
-    if (betBlock1) {
-      const buttonsOfBlock1 = betBlock1.querySelectorAll('button');
-      const inputsOfBlock1 = betBlock1.querySelectorAll('input');
-      disableAllElements([...buttonsOfBlock1, ...inputsOfBlock1], isDisabled);
-    }
-    
-    if (betBlock2) {
-      const buttonsOfBlock2 = betBlock2.querySelectorAll('button');
-      const inputsOfBlock2 = betBlock2.querySelectorAll('input');
-      disableAllElements([...buttonsOfBlock2, ...inputsOfBlock2], isDisabled);
-    }
+
+  // Получаем все кнопки и инпуты для каждого блока
+  if (betBlock1)
+  {
+    const buttonsOfBlock1 = betBlock1.querySelectorAll('button');
+    const inputsOfBlock1 = betBlock1.querySelectorAll('input');
+    disableAllElements([...buttonsOfBlock1, ...inputsOfBlock1], isDisabled);
+  }
+
+  if (betBlock2)
+  {
+    const buttonsOfBlock2 = betBlock2.querySelectorAll('button');
+    const inputsOfBlock2 = betBlock2.querySelectorAll('input');
+    disableAllElements([...buttonsOfBlock2, ...inputsOfBlock2], isDisabled);
+  }
 }
 
 
@@ -987,10 +1049,10 @@ function disableAllButtons(numberBlock, isDisabled)
  */
 function changeBetButtonsClass(numberButton, className)
 {
-  if(DEV_MODE) console.info('*************changeBetButtonsClass*****************');
-  if(DEV_MODE) console.info('numberButton ' + numberButton);
-  if(DEV_MODE) console.info('className ' + className);
-  if(DEV_MODE) console.info('*************changeBetButtonsClass*****************');
+  if (DEV_MODE) console.info('*************changeBetButtonsClass*****************');
+  if (DEV_MODE) console.info('numberButton ' + numberButton);
+  if (DEV_MODE) console.info('className ' + className);
+  if (DEV_MODE) console.info('*************changeBetButtonsClass*****************');
   // Определение классов и соответствующих цветов
   const classes = ["gTqZvy", "zabrat", "ozgidanie", "otmenit"];
   const classToColor = {
@@ -1010,7 +1072,7 @@ function changeBetButtonsClass(numberButton, className)
   };
 
   function updateButtonClass(button)
-  {    
+  {
     button.classList.remove(...classes); // Удаляем предыдущие классы, чтобы избежать конфликтов    
     button.classList.add(className); // Добавляем новый класс кнопке
 
@@ -1025,10 +1087,10 @@ function changeBetButtonsClass(numberButton, className)
     {
       // Проверяем, существует ли уже элемент 'currentWin zabratX' в родительском элементе
       let currentWin = button.parentElement.querySelector('currentWin.zabratX');
-      
+
       if (!currentWin)
       {
-        if (DEV_MODE) console.info("СОЗДАЁМ ЭЛЕМЕНТ Для кнопки 'Забрать'")        
+        if (DEV_MODE) console.info("СОЗДАЁМ ЭЛЕМЕНТ Для кнопки 'Забрать'")
         currentWin = document.createElement('div');
         //if (DEV_MODE) console.info(currentWin);
         currentWin.className = 'currentWin zabratX';
@@ -1041,8 +1103,8 @@ function changeBetButtonsClass(numberButton, className)
   }
 
   // Определяем, какую кнопку нужно обновить
-  if (numberButton === 1)       updateButtonClass(betButton1);
-  else if (numberButton === 2)  updateButtonClass(betButton2);
+  if (numberButton === 1) updateButtonClass(betButton1);
+  else if (numberButton === 2) updateButtonClass(betButton2);
   else if (numberButton === 0)
   { // Применяем для всех кнопок
     updateButtonClass(betButton1);
@@ -1071,8 +1133,8 @@ function isUserMadeBet()
  */
 function checkAndGetBetBlocks(param = null) 
 {
-//if(DEV_MODE) console.info("==============checkAndGetBetBlocks=================");
-//if(DEV_MODE) console.info("ПОИСКИ : param = " + param);
+  //if(DEV_MODE) console.info("==============checkAndGetBetBlocks=================");
+  //if(DEV_MODE) console.info("ПОИСКИ : param = " + param);
   const result = [];
 
   if (param === null) return null; // Или return result, если вы хотите возвращать пустой массив вместо null
@@ -1087,14 +1149,15 @@ function checkAndGetBetBlocks(param = null)
 // Функция для анимации числа
 function animateNumber(targetX)
 {
-  currentNumber = 1.0; // Начальное значение
+  currentNumber = 1.0; // Начальное значение  
   let step = 0.01; // Начальный шаг изменения числа
   let lastTimestamp = 0; // Время последнего обновления
   let updateInterval = 50; // Интервал обновления в миллисекундах
 
   isNumberActive = true; // Устанавливаем флаг активации раунда
 
-  const curX = flyaway.children[0]; // Элемент для отображения числа  
+  //const curX = flyaway.children[0]; // Элемент для отображения числа  
+  setElementOpacity(curX, '1'); ///////////////////////ТЕСТ
   var allBets = null
   //РАБОТА С ПОЛЬЗОВАТЕЛЕМ
   if (isUserMadeBet()) 
@@ -1105,7 +1168,8 @@ function animateNumber(targetX)
     if (DEV_MODE) console.info("=============================================");
   }
 
-  StartJetPack(targetX);
+  StartJetPack(targetX); /////Взлёт
+
   function updateNumber(timestamp)
   {
     //if (DEV_MODE) console.info("targetX    " + targetX)
@@ -1117,8 +1181,8 @@ function animateNumber(targetX)
       curX.textContent = currentNumber.toFixed(2);
 
       //////////////////
-      if(isUserMadeBet()) // Если ставка была, то обновляем её
-      {        
+      if (isUserMadeBet()) // Если ставка была, то обновляем её
+      {
         if (allBets !== null && allBets.length > 0)
         {
           allBets.forEach(block =>
@@ -1137,16 +1201,16 @@ function animateNumber(targetX)
           });
         }
       }
-      
+
       /////////////////
       lastTimestamp = timestamp; // Обновляем время последнего обновления
 
       // Адаптируем шаг изменения числа
-      if (currentNumber < 1.10) step = 0.005;
-      else if (currentNumber < 2.0)step = 0.009;
-      else if (currentNumber < 5.0)step = 0.02;
-      else if(currentNumber < 10.0) step = 0.05;
-      else if(currentNumber < 20.0) step = 0.09;    
+      if (currentNumber < 1.20) step = 0.004;
+      else if (currentNumber < 2.0) step = 0.009;
+      else if (currentNumber < 5.0) step = 0.02;
+      else if (currentNumber < 10.0) step = 0.05;
+      else if (currentNumber < 20.0) step = 0.09;
       else
       {
         updateInterval = updateInterval - 0.01; // Уменьшаем интервал обновления для ускорения анимации
@@ -1156,7 +1220,7 @@ function animateNumber(targetX)
 
     // Продолжаем анимацию, пока не достигнем целевого значения
     if (currentNumber < targetX) requestAnimationFrame(updateNumber);//ЛЕТИМ
-    else if (currentNumber >= targetX && targetX > 1.2)  //УЛЕТЕЛ
+    else if (currentNumber >= targetX )  //УЛЕТЕЛ  && targetX >= 1.2
     {
       //currentWinInButton.style.display = 'none'; //Скрываем div с индикатором выйгрыша
       isNumberActive = false; // Сбрасываем флаг активации раунда
@@ -1182,4 +1246,4 @@ function waitForAnimationToComplete(flag)
   });
 }
 
-animateNumber(1.04); // Запускаем анимацию числа
+animateNumber(1.16); // Запускаем анимацию числа
