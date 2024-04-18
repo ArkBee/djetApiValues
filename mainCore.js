@@ -762,15 +762,50 @@ async function flyawayJetPack(X)
   isFlyawayActive = true;
   motionJetPack('off'); // Останавливаем анимацию
 
-  isFlyAwayExecuted = false; // Сбрасываем флаг выполнения анимации
+  isFlyAwayExecuted = false; // Сбрасываем флаг выполнения анимации  
+  
+/*
+  /////////////// TEST
 
+function findDirectionTowards(targetX, targetY, currentX, currentY, stepSize) {
+  // Вычисляем вектор направления от текущего положения к цели
+  let directionX = targetX - currentX;
+  let directionY = targetY - currentY;
 
+  // Находим длину этого вектора (его модуль)
+  let length = Math.sqrt(directionX * directionX + directionY * directionY);
+
+  // Нормализуем вектор (делаем его длину равной 1), проверяем на ноль, чтобы избежать деления на ноль
+  if (length > 0) {
+    directionX /= length;
+    directionY /= length;
+  }
+
+  // Умножаем нормализованный вектор на размер шага, чтобы получить величину перемещения в каждом направлении
+  let moveX = directionX * stepSize;
+  let moveY = directionY * stepSize;
+
+  // Возвращаем объект с расчетными перемещениями в направлениях X и Y
+  return { moveX, moveY };
+}
+
+let direction = findDirectionTowards(targetXg+100, targetYg+100, Xg, Yg, 3);
+      Xg= direction.moveX;
+      Yg= direction.moveY;
+
+///////////////////////
+
+*/
   function animateFlyAway()
   {
     if (Xg < centerOfJetPack + centerOfJetPack) // Предположим, что 400 это конечная точка по X для улетания
     {
-      Xg += 7; // Скорость улетания
-      Yg -= 3.5;
+      if(Xg < curX.offsetLeft) Yg -= 5; // Скорость улетания
+      else Yg -= 3.5*3;
+      Xg += 7*3; // Скорость улетания
+      
+     
+      
       JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
       // //onsole.info(Xg);      //Вывести в лог текущее значение  Xg
 
