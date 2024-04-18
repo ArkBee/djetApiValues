@@ -624,8 +624,8 @@ function motionJetPack(command)
 }
 
   let targetYg =  -curX.offsetTop +curX.offsetHeight *2.5 ;; // Конечная при 100%  
-  let targetXg =  curX.offsetLeft *1.5; // Конечная при 100%
-  
+  let targetXg =  curX.offsetLeft *1.4; // Конечная при 100%
+  console.info("targetXg: "+ targetXg);
 
 
 
@@ -646,12 +646,12 @@ async function StartJetPack(coefficientX)
   function calculateEndValue(X, targetX) 
   {
     // Проверяем, что X находится в допустимом диапазоне
-    if (X < 1.00 || X > 1.20) 
+    if (X < 1.00 || X > 1.10) 
     {      
       return targetX;
     }  
     // Преобразование X в процентное соотношение относительно диапазона 1.01 - 1.20
-    const percentage = (X - 1.00) / (1.20 - 1.00);  
+    const percentage = (X - 1.00) / (1.20 - 1.10);  
     // Вычисление соответствующего значения endValue
     const endValue = percentage * targetX;  
     return endValue;
@@ -661,18 +661,19 @@ async function StartJetPack(coefficientX)
   //let percent = coefficientX > 1.20 ? 100 : (coefficientX - 1.00) * (100 / (1.20 - 1.00));
   let endPointX = calculateEndValue(coefficientX, targetXg);  
   let endPointY = calculateEndValue(coefficientX, targetYg);
-  let percent = endPointX/ targetXg * 100;  
+  //let percent = endPointX/ targetXg * 100;  
 
 
   //let StepYg = ((percent / 100 * endPointY) - Yg)/100; // Конечная при 100% - Yg
-  let StepYg = endPointY/80 ; // Конечная при 100% - Yg
-  let StepXg = endPointX / 100; // Конечная при 100% - Xg
+  let StepYg = endPointY/35 ; // Конечная при 100% - Yg
+  let StepXg = endPointX / 70; // Конечная при 100% - Xg
 
   console.info("StepXg: "+ StepXg);
      
   // Рассчитываем процент выполнения анимации на основе коэффициента X
   
   let targetX = endPointX; // Целевая позиция X в зависимости от процента выполнения (centerOfJetPack + 43) * completionPercentage;
+  console.info("targetX: "+ targetX);
   setElementOpacity(JetPak, '1');
   setElementOpacity(AllJettPak, '1');
   setElementOpacity(Waiting, '0');
@@ -681,6 +682,7 @@ async function StartJetPack(coefficientX)
   {
     if (Xg < targetX )
     {
+      console.info("Xg: "+ Xg);
       Xg += StepXg; // Скорость движения      
       Yg += StepYg; // Скорость движения
      // if (completionPercentage < 0.5)  Yg -= 0.1; // Скорость движения
