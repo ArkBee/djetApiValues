@@ -651,7 +651,7 @@ async function StartJetPack(coefficientX)
       return targetX;
     }  
     // Преобразование X в процентное соотношение относительно диапазона 1.01 - 1.20
-    const percentage = (X - 1.00) / (1.20 - 1.10);  
+    const percentage = (X - 1.00) / (1.20 - 1.00);  
     // Вычисление соответствующего значения endValue
     const endValue = percentage * targetX;  
     return endValue;
