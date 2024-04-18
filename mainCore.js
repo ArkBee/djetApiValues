@@ -677,14 +677,19 @@ async function StartJetPack(coefficientX)
   setElementOpacity(JetPak, '1');
   setElementOpacity(AllJettPak, '1');
   setElementOpacity(Waiting, '0');
+  let acceleration = 0.01; // Ускорение
 
   function animateStart()
   {
     if (Xg < targetX )
     {
       console.info("Xg: "+ Xg);
-      Xg += StepXg; // Скорость движения      
-      Yg += StepYg; // Скорость движения
+
+      Xg += StepXg * acceleration; // Скорость движения      
+      Yg += StepYg * acceleration; // Скорость движения
+      if(Xg < targetX/3) acceleration += 0.01; // Ускорение
+    
+      
      // if (completionPercentage < 0.5)  Yg -= 0.1; // Скорость движения
 
       JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
