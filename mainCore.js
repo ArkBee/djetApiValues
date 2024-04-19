@@ -414,7 +414,7 @@ let arrowX = true; // Направление движения по X
 let arrowY = true; // Направление движения по Y
 let animationFrameId = null; // ID анимации
 
-let centerOfJetPack = curX.offsetLeft + curX.offsetWidth*0.5; // Центральная точка JetPack
+let centerOfJetPack = curX.offsetLeft + curX.offsetWidth * 0.5; // Центральная точка JetPack
 
 //Флаги состояний для функций анимаций
 let isMotionJetPackActive = false;
@@ -623,95 +623,78 @@ function motionJetPack(command)
   animationFrameId = requestAnimationFrame(motionJetPack); // Обновляем идентификатор анимации
 }
 
-  let targetYg =  -curX.offsetTop +curX.offsetHeight *2.5 ;; // Конечная при 100%  
-  let targetXg =  curX.offsetLeft *1.4; // Конечная при 100%
-  console.info("targetXg: "+ targetXg);
 
+
+let targetYg = -curX.offsetTop + curX.offsetHeight * 2.5;; // Конечная при 100%  
+let targetXg = curX.offsetLeft * 1.4; // Конечная при 100%
+console.info("targetXg: " + targetXg);
+
+function stopAnimation()
+{
+  animationShouldContinue = false; // Указываем, что анимация должна быть прервана
+}
 
 
 
 async function StartJetPack(coefficientX)
-{
+{   
   canBetToThisRound = false; // Вовремя начала раунда, ставки идут на следующий раунд
+  
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
   if (isWaitingProgressBarActive) await waitForAnimationToComplete('isWaitingProgressBarActive');
 
-  // Теперь мы уверены, что другие анимации завершены
-  isMotionJetPackActive = true;
+  // Теперь мы уверены, что другие анимации завершены  
 
-  Xg = -95; // Начальное значение X
-  Yg = 90;  // Начальное значение Y 90
+  //Xg = -95; // Начальное значение X
+ // Yg = 90;  // Начальное значение Y 90
 
-  function calculateEndValue(X, targetX) 
-  {
-    // Проверяем, что X находится в допустимом диапазоне
-    if (X < 1.00 || X > 1.10) 
-    {      
-      return targetX;
-    }  
-    // Преобразование X в процентное соотношение относительно диапазона 1.01 - 1.20
-    const percentage = (X - 1.00) / (1.20 - 1.00);  
-    // Вычисление соответствующего значения endValue
-    const endValue = percentage * targetX;  
-    return endValue;
-  }
+  Xg = -95 ; // Начальное значение X
+  Yg =  130;  // Начальное значение Y 90
 
-  // Расчитываем конечную Yg в зависимости от коэффициента X
-  //let percent = coefficientX > 1.20 ? 100 : (coefficientX - 1.00) * (100 / (1.20 - 1.00));
-  let endPointX = calculateEndValue(coefficientX, targetXg);  
-  let endPointY = calculateEndValue(coefficientX, targetYg);
-  //let percent = endPointX/ targetXg * 100;  
+  let endPointX = targetXg; //calculateEndValue(coefficientX, targetXg);  
+  let endPointY = targetYg; //calculateEndValue(coefficientX, targetYg);
 
-
-  //let StepYg = ((percent / 100 * endPointY) - Yg)/100; // Конечная при 100% - Yg
-  let StepYg = endPointY/35 ; // Конечная при 100% - Yg
+  let StepYg = endPointY / 35; // Конечная при 100% - Yg
   let StepXg = endPointX / 70; // Конечная при 100% - Xg
-
-  console.info("StepXg: "+ StepXg);
-     
-  // Рассчитываем процент выполнения анимации на основе коэффициента X
-  
+ 
   let targetX = endPointX; // Целевая позиция X в зависимости от процента выполнения (centerOfJetPack + 43) * completionPercentage;
-  console.info("targetX: "+ targetX);
+  
   setElementOpacity(JetPak, '1');
   setElementOpacity(AllJettPak, '1');
   setElementOpacity(Waiting, '0');
-  let acceleration = 0.01; // Ускорение
+  
+  let acceleration = 0.3; // Ускорение
 
+  animationShouldContinue = true; // Флаг для проверки, нужна для прерывания анимации
   function animateStart()
   {
-    if (Xg < targetX )
-    {
-      console.info("Xg: "+ Xg);
+    // Проверяем, должна ли анимация продолжаться
+    if (!animationShouldContinue) return; // Если нет, выходим из функции
 
+    if (Xg < targetX)
+    {  
       Xg += StepXg * acceleration; // Скорость движения      
       Yg += StepYg * acceleration; // Скорость движения
-      if(Xg < targetX/3) acceleration += 0.01; // Ускорение
-    
-      
-     // if (completionPercentage < 0.5)  Yg -= 0.1; // Скорость движения
+      if (Xg < targetX / 3) acceleration += 0.01; // Ускорение      
 
       JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
 
       // Обновляем координаты для анимаций прыжка
-      var newX = Xg - 70 * 2.5;
-      var newY = Yg + 20; //20
+      //let newX = Xg - 70 * 2.5;
+      //let newY = Yg + 20; //20
+      let newX = Xg;
+      let newY = Yg; //20
       //if(DEV_MODE) console.info('newY ' + newY);
-      var newD = `M -95 190 Q ${ 167 + newX } 190 ${ 250 + newX } ${ newY }`;
+      let newD = `M -95 190 Q ${ 1 + newX } 190 ${ 100 + newX } ${ newY }`;
       jumpLine1.setAttribute('d', newD); // Обновляем атрибут 'd' для первой линии
-      jumpLine2.setAttribute('d', newD + ` L ${ 250 + newX } 190 Z`); // Обновляем атрибут 'd' для второй линии
+      jumpLine2.setAttribute('d', newD + ` L ${ 100 + newX } 190 Z`); // Обновляем атрибут 'd' для второй линии
 
       requestAnimationFrame(animateStart); // Запрашиваем следующий кадр анимации
-    }
-    else if (Xg >= targetX && coefficientX <= 1.20)
-    {
-      isMotionJetPackActive = false;      
-      //flyawayJetPack(coefficientX); // Запускаем анимацию улетания JetPack
-    }
+    }    
     else if (coefficientX >= 1.20)
     {
-      isMotionJetPackActive = true;      
+      isMotionJetPackActive = true;
       motionJetPack(); // Запускаем анимацию JetPack
     }
   }
@@ -722,6 +705,8 @@ async function StartJetPack(coefficientX)
 // Функция для "улетания" JetPack
 async function flyawayJetPack(X)
 {
+  isMotionJetPackActive = false;
+  stopAnimation();
   if (isUserMadeBet()) // если ставка была, то она сгорела
   {
     if (DEV_MODE) console.info("СДЕЛАЛИ КНОПКИ Ставка")
@@ -763,49 +748,47 @@ async function flyawayJetPack(X)
   motionJetPack('off'); // Останавливаем анимацию
 
   isFlyAwayExecuted = false; // Сбрасываем флаг выполнения анимации  
+
+  /*
+    /////////////// TEST
   
-/*
-  /////////////// TEST
-
-function findDirectionTowards(targetX, targetY, currentX, currentY, stepSize) {
-  // Вычисляем вектор направления от текущего положения к цели
-  let directionX = targetX - currentX;
-  let directionY = targetY - currentY;
-
-  // Находим длину этого вектора (его модуль)
-  let length = Math.sqrt(directionX * directionX + directionY * directionY);
-
-  // Нормализуем вектор (делаем его длину равной 1), проверяем на ноль, чтобы избежать деления на ноль
-  if (length > 0) {
-    directionX /= length;
-    directionY /= length;
+  function findDirectionTowards(targetX, targetY, currentX, currentY, stepSize) {
+    // Вычисляем вектор направления от текущего положения к цели
+    let directionX = targetX - currentX;
+    let directionY = targetY - currentY;
+  
+    // Находим длину этого вектора (его модуль)
+    let length = Math.sqrt(directionX * directionX + directionY * directionY);
+  
+    // Нормализуем вектор (делаем его длину равной 1), проверяем на ноль, чтобы избежать деления на ноль
+    if (length > 0) {
+      directionX /= length;
+      directionY /= length;
+    }
+  
+    // Умножаем нормализованный вектор на размер шага, чтобы получить величину перемещения в каждом направлении
+    let moveX = directionX * stepSize;
+    let moveY = directionY * stepSize;
+  
+    // Возвращаем объект с расчетными перемещениями в направлениях X и Y
+    return { moveX, moveY };
   }
-
-  // Умножаем нормализованный вектор на размер шага, чтобы получить величину перемещения в каждом направлении
-  let moveX = directionX * stepSize;
-  let moveY = directionY * stepSize;
-
-  // Возвращаем объект с расчетными перемещениями в направлениях X и Y
-  return { moveX, moveY };
-}
-
-let direction = findDirectionTowards(targetXg+100, targetYg+100, Xg, Yg, 3);
-      Xg= direction.moveX;
-      Yg= direction.moveY;
-
-///////////////////////
-
-*/
+  
+  let direction = findDirectionTowards(targetXg+100, targetYg+100, Xg, Yg, 3);
+        Xg= direction.moveX;
+        Yg= direction.moveY;
+  
+  ///////////////////////
+  
+  */
   function animateFlyAway()
   {
     if (Xg < centerOfJetPack + centerOfJetPack) // Предположим, что 400 это конечная точка по X для улетания
     {
-      if(Xg < curX.offsetLeft) Yg -= 5; // Скорость улетания
-      else Yg -= 3.5*3;
-      Xg += 7*3; // Скорость улетания
-      
-     
-      
+      if (Xg < curX.offsetLeft) Yg -= 5; // Скорость улетания
+      else Yg -= 3.5 * 3;
+      Xg += 7 * 3; // Скорость улетания
+
       JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
       // //onsole.info(Xg);      //Вывести в лог текущее значение  Xg
 
@@ -1262,7 +1245,7 @@ function animateNumber(targetX)
 
     // Продолжаем анимацию, пока не достигнем целевого значения
     if (currentNumber < targetX) requestAnimationFrame(updateNumber);//ЛЕТИМ
-    else if (currentNumber >= targetX )  //УЛЕТЕЛ  && targetX >= 1.2
+    else if (currentNumber >= targetX)  //УЛЕТЕЛ  && targetX >= 1.2
     {
       //currentWinInButton.style.display = 'none'; //Скрываем div с индикатором выйгрыша
       isNumberActive = false; // Сбрасываем флаг активации раунда
