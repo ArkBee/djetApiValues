@@ -627,7 +627,7 @@ function motionJetPack(command)
 
 let targetYg = -curX.offsetTop + curX.offsetHeight * 2.5;; // Конечная при 100%  
 let targetXg = curX.offsetLeft * 1.4; // Конечная при 100%
-console.info("targetXg: " + targetXg);
+  
 
 function stopAnimation()
 {
@@ -739,7 +739,6 @@ async function flyawayJetPack(X)
   curX.textContent = parseFloat(X).toFixed(2);
   parrentDivBlock.prepend(createClass(X)); // Добавляем новый блок с числом в верхнюю часть экрана
 
-
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
   if (isWaitingProgressBarActive) await waitForAnimationToComplete('isWaitingProgressBarActive');
@@ -789,8 +788,7 @@ async function flyawayJetPack(X)
       else Yg -= 3.5 * 3;
       Xg += 7 * 3; // Скорость улетания
 
-      JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
-      // //onsole.info(Xg);      //Вывести в лог текущее значение  Xg
+      JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;     
 
       if (!isFlyAwayExecuted)
       {
