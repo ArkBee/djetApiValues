@@ -160,6 +160,10 @@ const jumpLine1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.s
 const jumpLine2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO > div > div:nth-child(1) > div.sc-fnGiBr.gpBElz > div.sc-eDWCr.iiOtUt > svg > g > path:nth-child(2)");
 const notifyWin = document.querySelector("#mobile > div.sc-lhlUkk.aBbyI");
 const balanceHtml = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-cqQeAO.kvGivG > div > div > div.sc-iAEawV.bjXaQD.sc-AHaJN.sc-EJAja.lioyCd.jGycXN > button > div > div");
+const balancesymbol = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-cqQeAO.kvGivG > div > div > div.sc-iAEawV.bjXaQD.sc-AHaJN.sc-EJAja.lioyCd.jGycXN > button > div > div:nth-child(3)");
+// валюта по английски 
+
+
 let currentWinInButton = document.querySelector("#make-bet-button > div > div.currentWin.zabratX");
 
 
@@ -400,7 +404,7 @@ function loadScript(url, callback)
 
 loadScript('.\\x.js', function ()
 {
-  console.log('Скрипт загружен и выполнен. v0.9 Новый расчёт движения');
+  console.log('Скрипт загружен и выполнен. v0.9.1 Индия');
 });
 
 let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
@@ -467,7 +471,7 @@ const UserInfo = {
 
       // Вычисляем текущее значение для анимации
       this._balanceValue = startValue + change * progress; // Обновляем напрямую _balanceValue
-      balanceHtml.textContent = `${ this._balanceValue.toFixed(2) }`;
+      balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } ₽`;
 
       if (progress < 1)
       {
@@ -475,7 +479,7 @@ const UserInfo = {
       } else
       {
         this._balanceValue = newValue; // Устанавливаем точное конечное значение
-        balanceHtml.textContent = `${ this._balanceValue.toFixed(2) }`;
+        balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } ₽`;
         this.animationFrameId = null; // Сброс ID анимации
       }
     };
@@ -513,7 +517,7 @@ function updateBalance(operation, betBlock)
   }
 
   // Обновляем отображение баланса пользователя на странице
-  //balanceHtml.textContent = `${UserInfo.balanceValue.toFixed(2)}`;
+  //balanceHtml.textContent = `${UserInfo.balanceValue.toFixed(2)} ₽`;
 }
 
 
@@ -1086,13 +1090,28 @@ function changeBetButtonsClass(numberButton, className)
   };
 
   // Соответствие классов тексту кнопки
-  const classToButtonText = {
-    ozgidanie: 'Ожидание',
-    gTqZvy: 'Ставка',
-    zabrat: 'Забрать',
-    otmenit: 'Отменить'
+
+  const classToButtonText = null;
+  if(!balancesymbol.textContent.contains("₹"))
+  {
+  classToButtonText= {
+    ozgidanie: 'Ожидание', //ind प्रतीक्षा
+    gTqZvy: 'Ставка', // ind दाँव
+    zabrat: 'Забрать', // ind उठायें
+    otmenit: 'Отменить' // ind रद्द करें
     // Добавьте другие соответствия здесь, если необходимо
   };
+  }
+  else
+  {
+    classToButtonText= {
+      ozgidanie: 'प्रतीक्षा', //ind प्रतीक्षा
+      gTqZvy: 'दाँव', // ind दाँव
+      zabrat: 'उठायें', // ind उठायें
+      otmenit: 'रद्द करें' // ind रद्द करें
+      // Добавьте другие соответствия здесь, если необходимо
+    };
+  }
 
   function updateButtonClass(button)
   {
