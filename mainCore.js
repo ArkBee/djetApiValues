@@ -1091,27 +1091,27 @@ function changeBetButtonsClass(numberButton, className)
 
   // Соответствие классов тексту кнопки
 
-  const classToButtonText = null;
-  if(!balancesymbol.textContent.contains("₹"))
-  {
-  classToButtonText= {
-    ozgidanie: 'Ожидание', //ind प्रतीक्षा
-    gTqZvy: 'Ставка', // ind दाँव
-    zabrat: 'Забрать', // ind उठायें
-    otmenit: 'Отменить' // ind रद्द करें
-    // Добавьте другие соответствия здесь, если необходимо
+  // Use let instead of const to allow reassignment
+let classToButtonText;
+
+// Check if the textContent of balancesymbol contains the "₹" character
+if (balancesymbol.textContent.includes("₹")) {
+  classToButtonText = {
+    ozgidanie: 'प्रतीक्षा',
+    gTqZvy: 'दाँव',
+    zabrat: 'उठायें',
+    otmenit: 'रद्द करें'
+    // Add other mappings here if needed
   };
-  }
-  else
-  {
-    classToButtonText= {
-      ozgidanie: 'प्रतीक्षा', //ind प्रतीक्षा
-      gTqZvy: 'दाँव', // ind दाँव
-      zabrat: 'उठायें', // ind उठायें
-      otmenit: 'रद्द करें' // ind रद्द करें
-      // Добавьте другие соответствия здесь, если необходимо
-    };
-  }
+} else {
+  classToButtonText = {
+    ozgidanie: 'Ожидание',
+    gTqZvy: 'Ставка',
+    zabrat: 'Забрать',
+    otmenit: 'Отменить'
+    // Add other mappings here if needed
+  };
+}
 
   function updateButtonClass(button)
   {
