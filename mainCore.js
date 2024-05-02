@@ -165,7 +165,7 @@ const balancesymbol = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > d
 
 
 let currentWinInButton = document.querySelector("#make-bet-button > div > div.currentWin.zabratX");
-
+let symbol = "₽";
 
 
 // 1 окно управления ставкой
@@ -1093,7 +1093,7 @@ function changeBetButtonsClass(numberButton, className)
 
   // Use let instead of const to allow reassignment
 let classToButtonText;
-let symbol = "₽";
+
 // Check if the textContent of balancesymbol contains the "₹" character
 if (balancesymbol.textContent.includes("₹")) {
   classToButtonText = {
