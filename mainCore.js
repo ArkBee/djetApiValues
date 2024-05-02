@@ -471,7 +471,7 @@ const UserInfo = {
 
       // Вычисляем текущее значение для анимации
       this._balanceValue = startValue + change * progress; // Обновляем напрямую _balanceValue
-      balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } ₽`;
+      balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } `+symbol;
 
       if (progress < 1)
       {
@@ -479,7 +479,7 @@ const UserInfo = {
       } else
       {
         this._balanceValue = newValue; // Устанавливаем точное конечное значение
-        balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } ₽`;
+        balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } `+symbol;
         this.animationFrameId = null; // Сброс ID анимации
       }
     };
@@ -841,7 +841,7 @@ function calculateWin(block) //TODO - добавить обновление ба
 
   //TODO СДЕЛАТЬ ПОД ДВОЙНОЙ X
   notifyWin.children[0].children[0].children[1].textContent = 'x' + XNow;  //notification
-  notifyWin.children[0].children[1].children[0].textContent = `${ win } ₽`; // how much money is raised
+  notifyWin.children[0].children[1].children[0].textContent = `${ win } `+symbol; // how much money is raised
   makeNotifyWinVisible(true);
 
 
@@ -1093,7 +1093,7 @@ function changeBetButtonsClass(numberButton, className)
 
   // Use let instead of const to allow reassignment
 let classToButtonText;
-
+let symbol = "₽";
 // Check if the textContent of balancesymbol contains the "₹" character
 if (balancesymbol.textContent.includes("₹")) {
   classToButtonText = {
@@ -1103,6 +1103,7 @@ if (balancesymbol.textContent.includes("₹")) {
     otmenit: 'रद्द करें'
     // Add other mappings here if needed
   };
+  symbol = "₹";
 } else {
   classToButtonText = {
     ozgidanie: 'Ожидание',
@@ -1233,11 +1234,11 @@ function animateNumber(targetX)
             {
               if (block.ID === 1)
               {
-                betButton1.firstChild.textContent = parseFloat(block.UserBetSize * currentNumber).toFixed(2) + ' ₽';
+                betButton1.firstChild.textContent = parseFloat(block.UserBetSize * currentNumber).toFixed(2) + ' '+symbol;
               }
               else if (block.ID === 2)
               {
-                betButton2.firstChild.textContent = parseFloat(block.UserBetSize * currentNumber).toFixed(2) + ' ₽';
+                betButton2.firstChild.textContent = parseFloat(block.UserBetSize * currentNumber).toFixed(2) + ' '+symbol;
               }
             }
           });
