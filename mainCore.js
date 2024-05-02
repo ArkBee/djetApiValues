@@ -471,7 +471,7 @@ const UserInfo = {
 
       // Вычисляем текущее значение для анимации
       this._balanceValue = startValue + change * progress; // Обновляем напрямую _balanceValue
-      balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } `+symbol;
+      balanceHtml.textContent = `${ this._balanceValue.toFixed(2) }`;
 
       if (progress < 1)
       {
@@ -479,7 +479,7 @@ const UserInfo = {
       } else
       {
         this._balanceValue = newValue; // Устанавливаем точное конечное значение
-        balanceHtml.textContent = `${ this._balanceValue.toFixed(2) } `+symbol;
+        balanceHtml.textContent = `${ this._balanceValue.toFixed(2) }`;
         this.animationFrameId = null; // Сброс ID анимации
       }
     };
