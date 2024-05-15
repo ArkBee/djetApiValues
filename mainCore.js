@@ -281,7 +281,9 @@ function getFormattedNumber(value,boolDot=true) //getFormattedNumber
   let localString;
   if(value > 1000)
   {    
-    localString = parseFloat( value).toLocaleString(locale, 
+    //если value является числом, то преобразуем его в строку и форматируем
+    if(typeof value !== 'number') value = parseFloat( value);    
+    localString = value.toLocaleString(locale, 
       {
           style: 'decimal',
           minimumFractionDigits: 2,
@@ -411,7 +413,7 @@ function loadScript(url, callback)
 
 loadScript('.\\x.js', function ()
 {
-  console.log('Скрипт загружен и выполнен. v0.92 Отступы');
+  console.log('Скрипт загружен и выполнен. v0.9 Новый расчёт движения');
 });
 
 let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
@@ -834,7 +836,7 @@ async function flyawayJetPack(X)
 function calculateWin(block) //TODO - добавить обновление баланса при выйгрыше
 {
   setElementOpacity(Waiting, '0');
-  let XNow = parseFloat(curX.textContent);
+  let XNow = parseFloat(curX.textContent.replace(' ', ''));
 
   let localBetSize = block.UserBetSize; //TODO - определить размер ставки
   let win = localBetSize * XNow; //TODO - calculate win  
@@ -847,7 +849,7 @@ function calculateWin(block) //TODO - добавить обновление ба
   if (DEV_MODE) console.info("XNow: " + XNow);
 
   //TODO СДЕЛАТЬ ПОД ДВОЙНОЙ X
-  notifyWin.children[0].children[0].children[1].textContent = 'x' + `${getFormattedNumber(XNow,false)}` ;  //notification
+  notifyWin.children[0].children[0].children[1].textContent = 'x' + `${getFormattedNumber(XNow,true)}` ;  //notification
   notifyWin.children[0].children[1].children[0].textContent = `${ getFormattedNumber(win) } `+ symbol; // how much money is raised
   makeNotifyWinVisible(true);
 
