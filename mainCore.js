@@ -287,7 +287,7 @@ function getFormattedNumber(value,boolDot=true) //getFormattedNumber
           minimumFractionDigits: 2,
       });
       if(boolDot) localString = localString.replace(",",'.');
-      console.info('localString ' + localString);
+      //console.info('localString ' + localString);
   }
   else localString = value;
   return localString;
@@ -606,8 +606,8 @@ function motionJetPack(command)
   AllJettPak.style.opacity = '1';
   JetPak.style.opacity = "1";
 
-  if (Xg < centerOfJetPack + 50) arrowX = true; //левый барьер
-  if (Xg > centerOfJetPack + 110) arrowX = false; //правый барьер
+  if (Xg < centerOfJetPack + 120) arrowX = true; //левый барьер
+  if (Xg > centerOfJetPack + 250) arrowX = false; //правый барьер
 
   if (Yg < -65) arrowY = true;
   if (Yg > -55) arrowY = false;
