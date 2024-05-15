@@ -160,13 +160,22 @@ const jumpLine1 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.s
 const jumpLine2 = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO > div > div:nth-child(1) > div.sc-fnGiBr.gpBElz > div.sc-eDWCr.iiOtUt > svg > g > path:nth-child(2)");
 const notifyWin = document.querySelector("#mobile > div.sc-lhlUkk.aBbyI");
 const balanceHtml = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-cqQeAO.kvGivG > div > div > div.sc-iAEawV.bjXaQD.sc-AHaJN.sc-EJAja.lioyCd.jGycXN > button > div > div");
-const balancesymbol = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-cqQeAO.kvGivG > div > div > div.sc-iAEawV.bjXaQD.sc-AHaJN.sc-EJAja.lioyCd.jGycXN > button > div > div:nth-child(3)");
-// валюта по английски 
-
-
 let currentWinInButton = document.querySelector("#make-bet-button > div > div.currentWin.zabratX");
-let symbol = "₽";
 
+let symbol = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-cqQeAO.kvGivG > div > div > div.sc-iAEawV.bjXaQD.sc-AHaJN.sc-EJAja.lioyCd.jGycXN > button > div > div:nth-child(3)").textContent;
+//убрать все знаки типо .\/[] и т.д.
+symbol = symbol.replace(/\s/g, '');
+let locale;
+if(symbol ==="₽") 
+  {
+    console.info("Выбрали ru-RU");
+    locale = "ru-RU"
+  }
+  else if(symbol === "₹")
+{
+  console.info("Выбрали en-IN");
+  locale =  "en-IN"
+}
 
 // 1 окно управления ставкой
 let inputBetBlockSize1 = document.querySelectorAll('#bet-amount-mobile-input')[0]; // Цифра ставки в 1 блоке
@@ -267,23 +276,21 @@ function makeNotifyWinVisible(visible, time = 400, nubmerOfCounter = 1)
   requestAnimationFrame(animate);
 }
 
-function getFormattedNumber(value) //getFormattedNumber
+function getFormattedNumber(value,boolDot=true) //getFormattedNumber
 {
-  let result = '';
-  //Если значение больше 1000, то делим rezult должен ставить '&nbsp;' после тысячной части
-  if (value >= 1000)
-  {
-    let str = value.toString();
-    if (str.length > 3)
-    {
-      let index = str.length - 3;
-      let part1 = str.substring(0, index);
-      let part2 = str.substring(index);
-      result = part1 + ' ' + part2;
-      return result;
-    }
+  let localString;
+  if(value > 1000)
+  {    
+    localString = parseFloat( value).toLocaleString(locale, 
+      {
+          style: 'decimal',
+          minimumFractionDigits: 2,
+      });
+      if(boolDot) localString = localString.replace(",",'.');
+      console.info('localString ' + localString);
   }
-  else return value;
+  else localString = value;
+  return localString;
 }
 
 /** 
@@ -404,7 +411,7 @@ function loadScript(url, callback)
 
 loadScript('.\\x.js', function ()
 {
-  console.log('Скрипт загружен и выполнен. v0.9.1 Индия');
+  console.log('Скрипт загружен и выполнен. v0.9 Новый расчёт движения');
 });
 
 let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
@@ -471,7 +478,7 @@ const UserInfo = {
 
       // Вычисляем текущее значение для анимации
       this._balanceValue = startValue + change * progress; // Обновляем напрямую _balanceValue
-      balanceHtml.textContent = `${ this._balanceValue.toFixed(2) }`;
+      balanceHtml.textContent =  `${getFormattedNumber(this._balanceValue.toFixed(2))}`;
 
       if (progress < 1)
       {
@@ -479,7 +486,7 @@ const UserInfo = {
       } else
       {
         this._balanceValue = newValue; // Устанавливаем точное конечное значение
-        balanceHtml.textContent = `${ this._balanceValue.toFixed(2) }`;
+        balanceHtml.textContent = getFormattedNumber((this._balanceValue.toFixed(2)));
         this.animationFrameId = null; // Сброс ID анимации
       }
     };
@@ -740,7 +747,7 @@ async function flyawayJetPack(X)
 
 
   // Корректируем последнее значение, чтобы точно соответствовать цели
-  curX.textContent = parseFloat(X).toFixed(2);
+  curX.textContent = getFormattedNumber(parseFloat(X).toFixed(2));
   parrentDivBlock.prepend(createClass(X)); // Добавляем новый блок с числом в верхнюю часть экрана
 
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
@@ -840,8 +847,8 @@ function calculateWin(block) //TODO - добавить обновление ба
   if (DEV_MODE) console.info("XNow: " + XNow);
 
   //TODO СДЕЛАТЬ ПОД ДВОЙНОЙ X
-  notifyWin.children[0].children[0].children[1].textContent = 'x' + XNow;  //notification
-  notifyWin.children[0].children[1].children[0].textContent = `${ win } `+symbol; // how much money is raised
+  notifyWin.children[0].children[0].children[1].textContent = 'x' + `${getFormattedNumber(XNow,false)}` ;  //notification
+  notifyWin.children[0].children[1].children[0].textContent = `${ getFormattedNumber(win) } `+ symbol; // how much money is raised
   makeNotifyWinVisible(true);
 
 
@@ -879,7 +886,7 @@ async function WaitingProgreesBar() //Ждём следующего раунда
   setElementOpacity(notifyWin, '0');
   setElementOpacity(waitNextRound, '1');
   setElementOpacity(curX, '0'); ///////////////////////ТЕСТ
-  curX.textContent = parseFloat(1.00).toFixed(2); // Устанавливаем начальное значение X
+  curX.textContent = `${ getFormattedNumber(parseFloat(1.00).toFixed(2)) }`; // Устанавливаем начальное значение X
 
   for (let end = 100; end > 0; end--)
   {
@@ -1090,29 +1097,13 @@ function changeBetButtonsClass(numberButton, className)
   };
 
   // Соответствие классов тексту кнопки
-
-  // Use let instead of const to allow reassignment
-let classToButtonText;
-
-// Check if the textContent of balancesymbol contains the "₹" character
-if (balancesymbol.textContent.includes("₹")) {
-  classToButtonText = {
-    ozgidanie: 'प्रतीक्षा',
-    gTqZvy: 'दाँव',
-    zabrat: 'उठायें',
-    otmenit: 'रद्द करें'
-    // Add other mappings here if needed
-  };
-  symbol = "₹";
-} else {
-  classToButtonText = {
+  const classToButtonText = {
     ozgidanie: 'Ожидание',
     gTqZvy: 'Ставка',
     zabrat: 'Забрать',
     otmenit: 'Отменить'
-    // Add other mappings here if needed
+    // Добавьте другие соответствия здесь, если необходимо
   };
-}
 
   function updateButtonClass(button)
   {
@@ -1221,7 +1212,7 @@ function animateNumber(targetX)
     if (elapsed > updateInterval) // Обновляем число, если прошло достаточно времени
     {
       currentNumber += step;
-      curX.textContent = currentNumber.toFixed(2);
+      curX.textContent = `${getFormattedNumber(currentNumber.toFixed(2))}`; // Обновляем значение числа
 
       //////////////////
       if (isUserMadeBet()) // Если ставка была, то обновляем её
@@ -1234,11 +1225,11 @@ function animateNumber(targetX)
             {
               if (block.ID === 1)
               {
-                betButton1.firstChild.textContent = parseFloat(block.UserBetSize * currentNumber).toFixed(2) + ' '+symbol;
+                betButton1.firstChild.textContent = `${getFormattedNumber((parseFloat(block.UserBetSize * currentNumber).toFixed(2)))}` + ' '+symbol;
               }
               else if (block.ID === 2)
               {
-                betButton2.firstChild.textContent = parseFloat(block.UserBetSize * currentNumber).toFixed(2) + ' '+symbol;
+                betButton2.firstChild.textContent = `${getFormattedNumber(parseFloat(block.UserBetSize * currentNumber).toFixed(2))}` + ' '+symbol;
               }
             }
           });
