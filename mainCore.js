@@ -411,7 +411,7 @@ function loadScript(url, callback)
 
 loadScript('.\\x.js', function ()
 {
-  console.log('Скрипт загружен и выполнен. v0.9 Новый расчёт движения');
+  console.log('Скрипт загружен и выполнен. v0.92 Отступы');
 });
 
 let queueOfX = [12.54, 120.28, 1.16, 30.39]; // Заранее заданный список чисел
