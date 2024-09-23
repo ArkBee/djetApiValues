@@ -719,7 +719,7 @@ async function StartJetPack(coefficientX)
       Xg += StepXg * acceleration; // Скорость движения      
       Yg += StepYg * acceleration; // Скорость движения
       if (Xg < targetX / 3) acceleration += 0.01; // Ускорение 
-      
+
       updateJetPakPosition(Xg, Yg);
 
       requestAnimationFrame(animateStart); // Запрашиваем следующий кадр анимации
@@ -1148,6 +1148,16 @@ var classToButtonText;
     gTqZvy: 'दाँव',
     zabrat: 'उठायें',
     otmenit: 'रद्द करें'};
+    // Добавьте другие соответствия здесь, если необходимо
+   }
+   else if(symbol === "$")
+    {
+    // Соответствие классов тексту кнопки
+    classToButtonText = {
+    ozgidanie: 'TEMPO DE ESPERA', // Tempo de espera
+    gTqZvy: 'APOSTA',
+    zabrat: 'PEGAR',
+    otmenit: 'ANULAR'};
     // Добавьте другие соответствия здесь, если необходимо
    }
   
