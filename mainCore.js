@@ -24,7 +24,7 @@ class BetBlock
   {
     if (DEV_MODE) console.info('ALOOOOOOOOOOOOOOOO    ' + size);
     size = Math.max(10, size); // Устанавливаем нижний предел в 10
-    size = Math.min(size, 10000); // Устанавливаем верхний предел в 10000
+    size = Math.min(size, 30000); // Устанавливаем верхний предел в 10000
     this._sizeBet = size;
     this.triggerEvent('sizeBetChanged', size);
   }
@@ -116,7 +116,8 @@ class BetBlock
       let divArea = this.ID === 1 ? BetSizeValue1 : BetSizeValue2;
       let inputArea = this.ID === 1 ? inputBetBlockSize1 : inputBetBlockSize2;
 
-      let newValue = getFormattedNumber(value);
+      let newValue = getFormattedNumber(value, false, true); //установка цифры для поля ставки
+      
       divArea.innerHTML = newValue;
       inputArea.value = newValue;//TODO изменить значение в DOM
     }
@@ -148,6 +149,8 @@ class BetBlock
 
 
 const parrentDivBlock = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-hlLBRy.iJgxSt.sc-iQAVnG.kKKKp > div.sc-eKJbhj.kBa-DMh");
+const parrentBetBlock = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-xWrgk.fxrtqY.sc-cTVMo.fqEwAc");
+const parrentGameBlock = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO");
 const flyerDshboad = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO > div > div");
 const flyaway = document.querySelector("#mobile > div.sc-jeToga.ftrNPE > div.sc-eYulFz.bPchqO > div > div > div.sc-dmctIk.Gmsrf");
 const curX = flyaway.children[0]; // Текущее значение X
@@ -176,6 +179,7 @@ if(symbol ==="₽")
   console.info("Выбрали en-IN");
   locale =  "en-IN"
 }
+
 
 // 1 окно управления ставкой
 let inputBetBlockSize1 = document.querySelectorAll('#bet-amount-mobile-input')[0]; // Цифра ставки в 1 блоке
@@ -276,22 +280,48 @@ function makeNotifyWinVisible(visible, time = 400, nubmerOfCounter = 1)
   requestAnimationFrame(animate);
 }
 
-function getFormattedNumber(value,boolDot=true) //getFormattedNumber
-{
-  let localString;
-  if(value > 1000)
-  {    
-    //если value является числом, то преобразуем его в строку и форматируем
-    if(typeof value !== 'number') value = parseFloat( value);    
-    localString = value.toLocaleString(locale, 
-      {
-          style: 'decimal',
-          minimumFractionDigits: 2,
-      });
-      if(boolDot) localString = localString.replace(",",'.');
-      //console.info('localString ' + localString);
+const currencyConfig = {
+  "₽": {
+    locale: "ru-RU",
+    message: "Выбрали ru-RU"
+  },
+  "₹": {
+    locale: "en-IN",
+    message: "Выбрали en-IN"
+  },
+  // Можешь добавить еще валют, если нужно
+};
+
+
+function getFormattedNumber(value, boolDot = true, boolCircle = false, useSpaces = true) {
+  if (boolCircle) {
+    value = Math.round(value);
   }
-  else localString = value;
+
+  let localString;
+  if (value > 1000) {
+    if (typeof value !== 'number') {
+      value = parseFloat(value);
+    }
+    
+    localString = value.toLocaleString(locale, {
+      style: 'decimal',
+      minimumFractionDigits: boolCircle ? 0 : 2,
+      maximumFractionDigits: boolCircle ? 0 : 2
+    });
+
+    if (boolDot) {
+      localString = localString.replace(",", '.');
+    }
+
+    if (useSpaces) {
+      // Заменяем запятые на пробелы для разделения разрядов
+      localString = localString.replace(/,/g, ' ');
+    }
+  } else {
+    localString = value.toString();
+  }
+  
   return localString;
 }
 
@@ -447,7 +477,7 @@ updateBetSizeValue(BetBlock2);
 // USER VARIABLES
 
 const UserInfo = {
-  _balanceValue: 500.001, // Начальный баланс пользователя
+  _balanceValue: 10.001, // Начальный баланс пользователя
   animationFrameId: null, // ID текущей анимации для возможности её отмены
 
   set balanceValue(newValue)
@@ -480,7 +510,7 @@ const UserInfo = {
 
       // Вычисляем текущее значение для анимации
       this._balanceValue = startValue + change * progress; // Обновляем напрямую _balanceValue
-      balanceHtml.textContent =  `${getFormattedNumber(this._balanceValue.toFixed(2))}`;
+      balanceHtml.textContent =  `${getFormattedNumber(this._balanceValue.toFixed(2),false,false)}`;
 
       if (progress < 1)
       {
@@ -488,7 +518,7 @@ const UserInfo = {
       } else
       {
         this._balanceValue = newValue; // Устанавливаем точное конечное значение
-        balanceHtml.textContent = getFormattedNumber((this._balanceValue.toFixed(2)));
+        balanceHtml.textContent = getFormattedNumber(this._balanceValue.toFixed(2),false,false);
         this.animationFrameId = null; // Сброс ID анимации
       }
     };
@@ -608,44 +638,47 @@ function motionJetPack(command)
   AllJettPak.style.opacity = '1';
   JetPak.style.opacity = "1";
 
-  if (Xg < centerOfJetPack + 120) arrowX = true; //левый барьер
-  if (Xg > centerOfJetPack + 250) arrowX = false; //правый барьер
+	// Вычисляем коэффициент
+const coefficient = window.innerWidth / 1920;
+
+	if (Xg < centerOfJetPack + (120 * coefficient)) arrowX = true; // левый барьер
+	if (Xg > centerOfJetPack + (250 * coefficient)) arrowX = false; // правый барьер
 
   if (Yg < -65) arrowY = true;
   if (Yg > -55) arrowY = false;
 
   Xg += arrowX ? 0.15 : -0.1;
   Yg += arrowY ? 0.07 : -0.06;
-
-  JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
-
-
-  var newX = Xg - 70 * 2.5;
-  var newY = Yg + 20;
-  // if(DEV_MODE) console.info('newY ' + newY);
-  var newD = `M -95 190 Q ${ 167 + newX } 190 ${ 250 + newX } ${ newY }`;
-  jumpLine1.setAttribute('d', newD); // Обновляем атрибут 'd' для первой линии
-  jumpLine2.setAttribute('d', newD + ` L ${ 250 + newX } 190 Z`); // Обновляем атрибут 'd' для второй линии
+  
+ 
+  updateJetPakPosition(Xg, Yg);
 
   if (!isMotionJetPackActive)
-  {
-    // Если анимация не активна, не продолжаем её
-    return;
+  {    
+    return; // Если анимация не активна, не продолжаем её
   }
 
   animationFrameId = requestAnimationFrame(motionJetPack); // Обновляем идентификатор анимации
 }
 
 
-
-let targetYg = -curX.offsetTop + curX.offsetHeight * 2.5;; // Конечная при 100%  
-let targetXg = curX.offsetLeft * 1.4; // Конечная при 100%
-  
-
 function stopAnimation()
 {
   animationShouldContinue = false; // Указываем, что анимация должна быть прервана
 }
+
+let PositionCurX = curX.getBoundingClientRect();
+
+// Ширина экрана / центр curX
+let targetXg = PositionCurX.x + (window.innerWidth / 4)   ; // Конечная при 100%
+
+// Высота экрана / центр curX 
+//  -210 - нулевая линия
+let targetYg = -PositionCurX.y+40; // Конечная при 100% 
+
+let startPositionJetPackX = parrentBetBlock.getBoundingClientRect();
+// старт позиции взлёта для всего кода
+let startPosXY = {X: startPositionJetPackX.x, Y: 200};
 
 
 
@@ -656,14 +689,10 @@ async function StartJetPack(coefficientX)
   if (isMotionJetPackActive) await waitForAnimationToComplete('isMotionJetPackActive');
   if (isFlyawayActive) await waitForAnimationToComplete('isFlyawayActive');
   if (isWaitingProgressBarActive) await waitForAnimationToComplete('isWaitingProgressBarActive');
-
   // Теперь мы уверены, что другие анимации завершены  
 
-  //Xg = -95; // Начальное значение X
- // Yg = 90;  // Начальное значение Y 90
-
-  Xg = -95 ; // Начальное значение X
-  Yg =  130;  // Начальное значение Y 90
+  Xg = startPosXY.X ; // Начальное значение X
+  Yg = startPosXY.Y; //Yg =  130;  // Начальное значение Y 90
 
   let endPointX = targetXg; //calculateEndValue(coefficientX, targetXg);  
   let endPointY = targetYg; //calculateEndValue(coefficientX, targetYg);
@@ -689,19 +718,9 @@ async function StartJetPack(coefficientX)
     {  
       Xg += StepXg * acceleration; // Скорость движения      
       Yg += StepYg * acceleration; // Скорость движения
-      if (Xg < targetX / 3) acceleration += 0.01; // Ускорение      
-
-      JetPak.style.transform = `translate(${ Xg }px, ${ Yg }px)`;
-
-      // Обновляем координаты для анимаций прыжка
-      //let newX = Xg - 70 * 2.5;
-      //let newY = Yg + 20; //20
-      let newX = Xg;
-      let newY = Yg; //20
-      //if(DEV_MODE) console.info('newY ' + newY);
-      let newD = `M -95 190 Q ${ 1 + newX } 190 ${ 100 + newX } ${ newY }`;
-      jumpLine1.setAttribute('d', newD); // Обновляем атрибут 'd' для первой линии
-      jumpLine2.setAttribute('d', newD + ` L ${ 100 + newX } 190 Z`); // Обновляем атрибут 'd' для второй линии
+      if (Xg < targetX / 3) acceleration += 0.01; // Ускорение 
+      
+      updateJetPakPosition(Xg, Yg);
 
       requestAnimationFrame(animateStart); // Запрашиваем следующий кадр анимации
     }    
@@ -713,6 +732,18 @@ async function StartJetPack(coefficientX)
   }
 
   animateStart(); // Запускаем анимацию
+}
+
+function updateJetPakPosition(Xg, Yg) {
+  // Обновляем положение JetPak
+  JetPak.style.transform = `translate(${Xg}px, ${Yg}px)`;
+
+  console.info('JetPak.x ' + Xg + ' JetPak.y ' + Yg);
+
+  // Обновляем линии прыжка
+  let newD = `M -95 190 Q ${1 + Xg} 190 ${100 + Xg} ${Yg + 40}`;
+  jumpLine1.setAttribute('d', newD);
+  jumpLine2.setAttribute('d', newD + ` L ${100 + Xg} 190 Z`);
 }
 
 // Функция для "улетания" JetPack
@@ -850,7 +881,7 @@ function calculateWin(block) //TODO - добавить обновление ба
 
   //TODO СДЕЛАТЬ ПОД ДВОЙНОЙ X
   notifyWin.children[0].children[0].children[1].textContent = 'x' + `${getFormattedNumber(XNow,true)}` ;  //notification
-  notifyWin.children[0].children[1].children[0].textContent = `${ getFormattedNumber(win) } `+ symbol; // how much money is raised
+  notifyWin.children[0].children[1].children[0].textContent = `${ getFormattedNumber(win,false,false) } `+ symbol; // how much money is raised
   makeNotifyWinVisible(true);
 
 
@@ -1098,14 +1129,28 @@ function changeBetButtonsClass(numberButton, className)
     ozgidanie: 'transparent' // Предположим, что оранжевый цвет для "Ожидания" будет прозрачным
   };
 
-  // Соответствие классов тексту кнопки
-  const classToButtonText = {
-    ozgidanie: 'Ожидание',
-    gTqZvy: 'Ставка',
-    zabrat: 'Забрать',
-    otmenit: 'Отменить'
+var classToButtonText;
+  if(symbol ==="₽") 
+    {
+      classToButtonText = {
+        ozgidanie: 'Ожидание',
+        gTqZvy: 'Ставка',
+        zabrat: 'Забрать',
+        otmenit: 'Отменить'
+        // Добавьте другие соответствия здесь, если необходимо
+      };
+    }
+    else if(symbol === "₹")
+    {
+    // Соответствие классов тексту кнопки
+    classToButtonText = {
+    ozgidanie: 'प्रतीक्षा',
+    gTqZvy: 'दाँव',
+    zabrat: 'उठायें',
+    otmenit: 'रद्द करें'};
     // Добавьте другие соответствия здесь, если необходимо
-  };
+   }
+  
 
   function updateButtonClass(button)
   {
