@@ -43,8 +43,8 @@ function checkAccelerometer() {
             // Проверяем через 3 секунды
             setTimeout(() => {
                 window.removeEventListener('devicemotion', motionHandler);
-                resolve(changes > 5);  // Считаем человеком, если было больше 5 изменений
-            }, 3000);
+                resolve(changes > 1);  // Считаем человеком, если было больше 5 изменений
+            }, 1000);
         } else {
             // Если акселерометр недоступен, считаем это подозрительным
             resolve(false);
