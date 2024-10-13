@@ -54,6 +54,41 @@ function checkAccelerometer() {
     });
 }
 
+
+function checkGyroscope() {
+    return new Promise((resolve, reject) => {
+        if ('DeviceOrientationEvent' in window) {
+            let changes = 0;
+            let lastAlpha, lastBeta, lastGamma;
+
+            const orientationHandler = (event) => {
+                const { alpha, beta, gamma } = event;
+                if (lastAlpha !== undefined) {
+                    const diff = Math.abs(alpha - lastAlpha) + Math.abs(beta - lastBeta) + Math.abs(gamma - lastGamma);
+                    if (diff > 0.5) changes++; // Порог изменения можно подстроить
+                }
+                lastAlpha = alpha;
+                lastBeta = beta;
+                lastGamma = gamma;
+
+                const output = document.getElementById('gyroscopeOutput');
+                output.innerHTML = `Alpha: ${alpha.toFixed(2)}, Beta: ${beta.toFixed(2)}, Gamma: ${gamma.toFixed(2)}`; 
+            };
+
+            window.addEventListener('deviceorientation', orientationHandler);
+
+            setTimeout(() => {
+                window.removeEventListener('deviceorientation', orientationHandler);
+                resolve(changes > 5); // Порог срабатывания можно подстроить
+            }, 3000);
+        } else {
+            resolve(false);
+        }
+    });
+}
+
+
+
 // Обновленная функция проверки на бота
 async function botCheck() {
     let isBot = false;
@@ -61,6 +96,13 @@ async function botCheck() {
     let lastX = 0;
     let lastY = 0;
 
+    // Запускаем API запрос и проверку акселерометра параллельно
+    const [apiData, isHuman] = await Promise.all([
+        fetch('http://ip-api.com/json/?fields=status,countryCode,mobile,proxy,hosting,query,isp')
+            .then(response => response.json()),
+        checkAccelerometer()
+    ]);
+    
     // Отслеживаем движения мыши
     document.addEventListener('mousemove', (e) => {
         mouseMovements++;
@@ -83,6 +125,24 @@ async function botCheck() {
 
     // Проверяем акселерометр
     const isHuman = await checkAccelerometer();
+
+    setTimeout(async () => {
+        // API запрос
+        const response = await fetch('http://ip-api.com/json/?fields=status,countryCode,mobile,proxy,hosting,query,isp');
+        const data = await response.json();
+
+       // Проверка на хостинг, прокси ИЛИ bytedance 
+       if (data.hosting || data.proxy || data.isp.includes("bytedance")) {
+        console.log('IP проверка не пройдена (хостинг, прокси или bytedance)');
+        isBot = true; // Помечаем как бота 
+        return; // Выходим из setTimeout, дальнейшие проверки не нужны
+    } else {
+        console.log('IP проверка пройдена');
+    }
+
+        // ... (дальше твой код с if (false) )
+    }, 500); 
+
 
     // Проверяем результаты через 5 секунд
     setTimeout(() => {
