@@ -32,23 +32,23 @@ function checkAccelerometer() {
                 if (lastX !== undefined) {
                     const diff = Math.abs(x - lastX) + Math.abs(y - lastY) + Math.abs(z - lastZ);
                     if (diff > 0.1) changes++;  // Небольшое изменение
-                    document.body.innerHTML += '<h1>СДВИГ ЕСТЬ</h1>';
                 }
                 lastX = x;
                 lastY = y;
                 lastZ = z;
+
+                // Вывод значений:
+                const output = document.getElementById('accelerometerOutput'); 
+                output.innerHTML = `X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}, Z: ${z.toFixed(2)}`; 
             };
 
             window.addEventListener('devicemotion', motionHandler);
 
-            document.body.innerHTML = '<h1>ЧЕКАЕМ АКСЕЛЬ</h1>';
-            // Проверяем через 3 секунды
             setTimeout(() => {
                 window.removeEventListener('devicemotion', motionHandler);
-                resolve(changes > 1);  // Считаем человеком, если было больше 5 изменений
-            }, 1000);
+                resolve(changes > 5); 
+            }, 3000);
         } else {
-            // Если акселерометр недоступен, считаем это подозрительным
             resolve(false);
         }
     });
