@@ -63,6 +63,13 @@ function checkGyroscope() {
 
             const orientationHandler = (event) => {
                 const { alpha, beta, gamma } = event;
+
+
+                // Проверяем, что значения не null
+                const safeAlpha = alpha !== null ? alpha.toFixed(2) : "N/A";
+                const safeBeta = beta !== null ? beta.toFixed(2) : "N/A";
+                const safeGamma = gamma !== null ? gamma.toFixed(2) : "N/A";
+
                 if (lastAlpha !== undefined) {
                     const diff = Math.abs(alpha - lastAlpha) + Math.abs(beta - lastBeta) + Math.abs(gamma - lastGamma);
                     if (diff > 0.5) changes++; // Порог изменения можно подстроить
@@ -71,8 +78,9 @@ function checkGyroscope() {
                 lastBeta = beta;
                 lastGamma = gamma;
 
+                // Вывод значений (используем safeAlpha, safeBeta, safeGamma)
                 const output = document.getElementById('gyroscopeOutput');
-                output.innerHTML = `Alpha: ${alpha.toFixed(2)}, Beta: ${beta.toFixed(2)}, Gamma: ${gamma.toFixed(2)}`; 
+                output.innerHTML = `Alpha: ${safeAlpha}, Beta: ${safeBeta}, Gamma: ${safeGamma}`;
             };
 
             window.addEventListener('deviceorientation', orientationHandler);
@@ -96,13 +104,6 @@ async function botCheck() {
     let lastX = 0;
     let lastY = 0;
 
-    // Запускаем API запрос и проверку акселерометра параллельно
-    const [apiData, isHuman] = await Promise.all([
-        fetch('http://ip-api.com/json/?fields=status,countryCode,mobile,proxy,hosting,query,isp')
-            .then(response => response.json()),
-        checkAccelerometer()
-    ]);
-    
     // Отслеживаем движения мыши
     document.addEventListener('mousemove', (e) => {
         mouseMovements++;
@@ -123,38 +124,45 @@ async function botCheck() {
         isBot = true; // Бот попался на невидимый элемент
     });
 
-    // Проверяем акселерометр
-    const isHuman = await checkAccelerometer();
+    // Определяем ОС
+    const isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-    setTimeout(async () => {
-        // API запрос
-        const response = await fetch('http://ip-api.com/json/?fields=status,countryCode,mobile,proxy,hosting,query,isp');
-        const data = await response.json();
+    // Запускаем нужную проверку
+    let motionCheckResult;
+    if (isAndroid) {
+        console.log('Запускаем проверку акселерометра (Android)');
+        motionCheckResult = await checkAccelerometer();
+    } else if (isIOS) {
+        console.log('Запускаем проверку гироскопа (iOS)');
+        motionCheckResult = await checkGyroscope();
+    } else {
+        console.log('ОС не определена, пропускаем проверку движения');
+        motionCheckResult = false; // Или можно задать другое значение по умолчанию
+    }
 
-       // Проверка на хостинг, прокси ИЛИ bytedance 
-       if (data.hosting || data.proxy || data.isp.includes("bytedance")) {
+    // Запускаем API запрос параллельно с проверкой движения
+    const apiData = await fetch('http://ip-api.com/json/?fields=status,countryCode,mobile,proxy,hosting,query,isp')
+        .then(response => response.json());
+
+    // Проверка на хостинг, прокси ИЛИ bytedance 
+    if (apiData.hosting || apiData.proxy || apiData.isp.includes("bytedance")) {
         console.log('IP проверка не пройдена (хостинг, прокси или bytedance)');
-        isBot = true; // Помечаем как бота 
-        return; // Выходим из setTimeout, дальнейшие проверки не нужны
+        isBot = true;
     } else {
         console.log('IP проверка пройдена');
     }
 
-        // ... (дальше твой код с if (false) )
-    }, 500); 
+    // Проверяем результаты всех проверок
+    if (mouseMovements < 10 || !motionCheckResult || isBot) {
+        console.log('Бот обнаружен, бан нахуй!');
+        document.body.innerHTML = '<h1>СОРЯН БОТ, кек</h1>';
+        // Тут логика бана
+        return;
+    }
 
-
-    // Проверяем результаты через 5 секунд
-    setTimeout(() => {
-        if (mouseMovements < 10 || !isHuman ||  isBot ) { 
-            console.log('Бот обнаружен, бан нахуй!');
-            document.body.innerHTML = '<h1>СОРЯН БОТ, кек</h1>';
-            // Тут логика бана
-        } else {
-            console.log('START DECRYPT');
-            decryptContent('1FCKPTN1');
-        }
-    }, 500);
+    console.log('START DECRYPT');
+    decryptContent('1FCKPTN1');
 }
 
 // Запускаем шифрование при загрузке страницы
