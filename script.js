@@ -86,6 +86,7 @@ async function botCheck() {
     setTimeout(() => {
         if (mouseMovements < 10 || !isHuman ||  isBot ) { 
             console.log('Бот обнаружен, бан нахуй!');
+            document.body.innerHTML = '<h1>СОРЯН БОТ, кек/h1>';
             // Тут логика бана
         } else {
             console.log('START DECRYPT');
