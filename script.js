@@ -124,6 +124,14 @@ async function botCheck() {
         isBot = true; // Бот попался на невидимый элемент
     });
 
+    // Проверка на вывод числа
+    const hypotResult = Math.hypot(-24.42, -50.519999999999925);
+    console.log('hypotResult:', hypotResult);
+
+    // Вывод значений:
+    const numCheck = document.getElementById('numOutput'); 
+    numCheck.innerHTML = `Результат вычисления hypot: ${hypotResult}`;
+
     // Определяем ОС
     const isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
