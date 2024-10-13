@@ -143,7 +143,7 @@ async function botCheck() {
         motionCheckResult = await checkAccelerometer();
     } else if (isIOS) {
         console.log('Запускаем проверку гироскопа (iOS)');
-        motionCheckResult = await checkGyroscope();
+       // motionCheckResult = await checkGyroscope();
     } else {
         console.log('ОС не определена, пропускаем проверку движения');
         motionCheckResult = false; // Или можно задать другое значение по умолчанию
