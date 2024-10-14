@@ -1,6 +1,4 @@
-// Новая функция: шифрование контента
 
-// Новая функция: расшифровка контента
 function decryptContent(password) {
     const encrypted = document.body.innerHTML.match(/<!--Start-->(.*?)<!--END-->/s)[1].trim();
     console.log("Пытаемся расшифровать:", encrypted); // Для дебага
@@ -55,48 +53,6 @@ function checkAccelerometer() {
 }
 
 
-function checkGyroscope() {
-    return new Promise((resolve, reject) => {
-        if ('DeviceOrientationEvent' in window) {
-            let changes = 0;
-            let lastAlpha, lastBeta, lastGamma;
-
-            const orientationHandler = (event) => {
-                const { alpha, beta, gamma } = event;
-
-
-                // Проверяем, что значения не null
-                const safeAlpha = alpha !== null ? alpha.toFixed(2) : "N/A";
-                const safeBeta = beta !== null ? beta.toFixed(2) : "N/A";
-                const safeGamma = gamma !== null ? gamma.toFixed(2) : "N/A";
-
-                if (lastAlpha !== undefined) {
-                    const diff = Math.abs(alpha - lastAlpha) + Math.abs(beta - lastBeta) + Math.abs(gamma - lastGamma);
-                    if (diff > 0.5) changes++; // Порог изменения можно подстроить
-                }
-                lastAlpha = alpha;
-                lastBeta = beta;
-                lastGamma = gamma;
-
-                // Вывод значений (используем safeAlpha, safeBeta, safeGamma)
-                const output = document.getElementById('gyroscopeOutput');
-                output.innerHTML = `Alpha: ${safeAlpha}, Beta: ${safeBeta}, Gamma: ${safeGamma}`;
-            };
-
-            window.addEventListener('deviceorientation', orientationHandler);
-
-            setTimeout(() => {
-                window.removeEventListener('deviceorientation', orientationHandler);
-                resolve(changes > 5); // Порог срабатывания можно подстроить
-            }, 3000);
-        } else {
-            resolve(false);
-        }
-    });
-}
-
-
-
 // Обновленная функция проверки на бота
 async function botCheck() {
     let isBot = false;
@@ -141,10 +97,8 @@ async function botCheck() {
     if (isAndroid) {
         console.log('Запускаем проверку акселерометра (Android)');
         motionCheckResult = await checkAccelerometer();
-    } else if (isIOS) {
-        console.log('Запускаем проверку гироскопа (iOS)');
-       // motionCheckResult = await checkGyroscope();
-    } else {
+    } 
+    else {
         console.log('ОС не определена, пропускаем проверку движения');
         motionCheckResult = false; // Или можно задать другое значение по умолчанию
     }
