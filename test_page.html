@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>Секретная страница</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="script.js"></script>
+    <!--comm <script src="script.js"></script -->
+	
 </head>
 <body>
     <!--Start-->
@@ -13,6 +14,24 @@
     <div id="accelerometerOutput"></div>
     <div id="gyroscopeOutput"></div>
     <div id="numOutput"></div>
+	<script>
+        speechSynthesis.onvoiceschanged = function() 
+        {
+            console.log(speechSynthesis.getVoices());
+        const voices = speechSynthesis.getVoices();
+        voices.forEach(voice => {
+        const voiceDiv = document.createElement('div');
+        voiceDiv.textContent = `${voice.name} (${voice.lang})`;
+        numOutput.appendChild(voiceDiv);
+        });
+  // ... твой код для вывода голосов ...
+};
+const numOutput = document.getElementById('numOutput');
+
+const voiceDiv = "test";
+
+
+</script>
 </body>
 
 </html>
