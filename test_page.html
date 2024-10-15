@@ -61,6 +61,7 @@ function populateVoiceListAndDetectOS() {
 
     const os = detectOSByVoices();
     console.log("Операционная система:", os);
+    numOutput.innerHTML += `<div>Операционная система: ${os}</div>`;
   } else {
     speechSynthesis.onvoiceschanged = function () {
       populateVoiceListAndDetectOS();
