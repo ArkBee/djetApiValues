@@ -15,8 +15,44 @@
     <div id="gyroscopeOutput"></div>
     <div id="numOutput"></div>
 	<script>
+function detectBrowserAndOS() {
+  const userAgent = navigator.userAgent;
+  let browserInfo = "Неизвестный браузер";
+  let osInfo = "Неизвестная ОС";
+
+  if (/Safari/.test(userAgent) && !/Chrome/.test(userAgent)) {
+    browserInfo = "Safari";
+  } else if (/Firefox/.test(userAgent)) {
+    browserInfo = "Firefox";
+  } else if (/Chrome/.test(userAgent)) {
+    browserInfo = "Chrome";
+  } else if (/Edge/.test(userAgent)) {
+    browserInfo = "Edge";
+  }
+
+  if (/Win/.test(userAgent)) {
+    osInfo = "Windows";
+  } else if (/Mac/.test(userAgent)) {
+    osInfo = "macOS";
+  } else if (/iPhone|iPad|iPod/.test(userAgent)) {
+    osInfo = "iOS";
+  } else if (/Android/.test(userAgent)) {
+    osInfo = "Android";
+  } else if (/Linux/.test(userAgent)) {
+    osInfo = "Linux";
+  }
+
+  return { browser: browserInfo, os: osInfo };
+}
+
 function detectOSByVoices() {
   const voices = speechSynthesis.getVoices();
+  const { browser, os } = detectBrowserAndOS();
+
+  if (browser === "Safari" || (voices.length === 0 && /^(Mac|iPhone|iPad|iPod)/.test(os))) {
+    return `${os} (вероятно Safari или другой WebKit браузер)`;
+  }
+
   const hasEnglish = voices.some(voice => voice.lang.startsWith('en'));
   const hasRussian = voices.some(voice => voice.lang.startsWith('ru'));
   const googleVoices = voices.filter(voice => voice.name.includes('Google'));
@@ -37,9 +73,11 @@ function detectOSByVoices() {
   } else if (hasEnglish && !hasRussian && appleVoices.length === 0) {
     return "Возможно Linux";
   } else {
-    return "Не удалось точно определить ОС";
+    return `Не удалось точно определить ОС. Предполагаемые ОС: ${os}, Браузер: ${browser}`;
   }
 }
+
+let voicesChangedHandled = false;
 
 function populateVoiceListAndDetectOS() {
   if (typeof speechSynthesis === 'undefined') {
@@ -49,7 +87,7 @@ function populateVoiceListAndDetectOS() {
 
   const voices = speechSynthesis.getVoices();
 
-  if (voices.length > 0) {
+  if (voices.length > 0 || voicesChangedHandled) {
     const numOutput = document.getElementById('numOutput');
     numOutput.innerHTML = ''; 
 
@@ -59,10 +97,11 @@ function populateVoiceListAndDetectOS() {
       numOutput.appendChild(voiceDiv);
     });
 
-    const os = detectOSByVoices();
-    console.log("Операционная система:", os);
-    numOutput.innerHTML += `<div>Операционная система: ${os}</div>`;
+    const result = detectOSByVoices();
+    numOutput.innerHTML = ("Операционная система и браузер: "+ result);
+    
   } else {
+    voicesChangedHandled = true;
     speechSynthesis.onvoiceschanged = function () {
       populateVoiceListAndDetectOS();
     };
